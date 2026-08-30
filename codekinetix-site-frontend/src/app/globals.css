@@ -1,0 +1,343 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* ── CodeKinetix palette : VOLT BRUTAL ──────────────────────── */
+  --color-void: #0a0a0b;
+  --color-panel: #151517;
+  --color-bone: #f2f1ea;
+  --color-volt: #3a6fff;
+  --color-flame: #ff4d00;
+  --color-ash: #9d9d94;
+
+  /* shadcn token bridge */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --animate-marquee: marquee 26s linear infinite;
+  --animate-drip: drip 1.9s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+  --animate-scan-y: scan-y 6.5s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes drip {
+    0% {
+      transform: translateY(-110%);
+    }
+    100% {
+      transform: translateY(320%);
+    }
+  }
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #0a0a0b;
+  --foreground: #f2f1ea;
+  --card: #151517;
+  --card-foreground: #f2f1ea;
+  --popover: #151517;
+  --popover-foreground: #f2f1ea;
+  --primary: #3a6fff;
+  --primary-foreground: #0a0a0b;
+  --secondary: #1d1d20;
+  --secondary-foreground: #f2f1ea;
+  --muted: #1d1d20;
+  --muted-foreground: #8f8f87;
+  --accent: #1d1d20;
+  --accent-foreground: #f2f1ea;
+  --destructive: #ff4d00;
+  --destructive-foreground: #0a0a0b;
+  --border: #26262a;
+  --input: #26262a;
+  --ring: #3a6fff;
+  --chart-1: #3a6fff;
+  --chart-2: #ff4d00;
+  --chart-3: #f2f1ea;
+  --chart-4: #8f8f87;
+  --chart-5: #151517;
+  --sidebar: #151517;
+  --sidebar-foreground: #f2f1ea;
+  --sidebar-primary: #3a6fff;
+  --sidebar-primary-foreground: #0a0a0b;
+  --sidebar-accent: #1d1d20;
+  --sidebar-accent-foreground: #f2f1ea;
+  --sidebar-border: #26262a;
+  --sidebar-ring: #3a6fff;
+}
+
+.dark {
+  --background: #0a0a0b;
+  --foreground: #f2f1ea;
+  --card: #151517;
+  --card-foreground: #f2f1ea;
+  --popover: #151517;
+  --popover-foreground: #f2f1ea;
+  --primary: #3a6fff;
+  --primary-foreground: #0a0a0b;
+  --secondary: #1d1d20;
+  --secondary-foreground: #f2f1ea;
+  --muted: #1d1d20;
+  --muted-foreground: #8f8f87;
+  --accent: #1d1d20;
+  --accent-foreground: #f2f1ea;
+  --destructive: #ff4d00;
+  --destructive-foreground: #0a0a0b;
+  --border: #26262a;
+  --input: #26262a;
+  --ring: #3a6fff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-display), system-ui, sans-serif;
+  }
+  ::selection {
+    background: #3a6fff;
+    color: #0a0a0b;
+  }
+}
+
+@layer utilities {
+  /* type utilities — Archivo variable width axis */
+  .type-xwide {
+    font-stretch: 125%;
+  }
+  .type-wide {
+    font-stretch: 112%;
+  }
+  .type-narrow {
+    font-stretch: 78%;
+  }
+  .font-mono {
+    font-family: var(--font-mono), monospace;
+  }
+  .font-serif {
+    font-family: var(--font-serif), Georgia, serif;
+  }
+
+  /* outline type — brutalist stroke variants */
+  .text-stroke-bone {
+    -webkit-text-stroke: 1.5px #f2f1ea;
+    color: transparent;
+  }
+  .text-stroke-volt {
+    -webkit-text-stroke: 1.5px #3a6fff;
+    color: transparent;
+  }
+  .text-stroke-flame {
+    -webkit-text-stroke: 1.5px #ff4d00;
+    color: transparent;
+  }
+  .text-stroke-void {
+    -webkit-text-stroke: 1.5px #0a0a0b;
+    color: transparent;
+  }
+
+  /* flat-text fallback for the particle wordmark — an outlined word
+     if a 2D canvas context can't be had. */
+  .mark-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px rgb(242 241 234 / 0.4);
+  }
+  @media (min-width: 640px) {
+    .mark-outline {
+      -webkit-text-stroke-width: 2.5px;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .text-stroke-bone {
+      -webkit-text-stroke-width: 2px;
+    }
+    .text-stroke-volt {
+      -webkit-text-stroke-width: 2px;
+    }
+    .text-stroke-flame {
+      -webkit-text-stroke-width: 2px;
+    }
+    .text-stroke-void {
+      -webkit-text-stroke-width: 2px;
+    }
+  }
+
+  /* technical grid + film grain — texture so black never reads flat */
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgba(242, 241, 234, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(242, 241, 234, 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+  }
+  .volt-glow {
+    box-shadow: 0 18px 70px rgba(58, 111, 255, 0.32), 0 0 34px rgba(58, 111, 255, 0.18);
+  }
+  .flame-glow {
+    box-shadow: 0 18px 70px rgba(255, 77, 0, 0.28);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  /* heavier stroke for display-scale outline type — declared LAST so it
+     wins over the sm: media overrides above */
+  .stroke-3 {
+    -webkit-text-stroke-width: 3px;
+  }
+
+  /* hero wordmark letters — volt fill on hover (micro-interaction) */
+  .av-h-char {
+    transition: color 0.22s ease;
+  }
+  .av-h-char:hover {
+    color: #3a6fff;
+  }
+}
+
+/* ── page transition — column wave panels ─────────────────────── */
+
+/* radar scanline — top-level so it is always emitted (Tailwind only
+   emits @theme keyframes it decides to inline) */
+@keyframes scan-y {
+  0% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  7% {
+    opacity: 0.65;
+  }
+  93% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(105vh);
+    opacity: 0;
+  }
+}
+
+.pt-panel {
+  position: absolute;
+  top: 0;
+  left: -6%;
+  width: 112%;
+  height: 135%;
+  will-change: transform;
+}
+.pt-col {
+  position: absolute;
+  top: -18%;
+  height: 136%;
+  will-change: transform;
+}
+/* R31 — the falling/exploding letters are 18vw glyphs animated with
+   transform+opacity; without promotion some browsers repaint them on
+   the main thread every frame of the transition. ~10 small layers. */
+.pt-letter {
+  will-change: transform, opacity;
+}
+
+/* ── embedded project shell — loading plate ───────────────────── */
+
+/* indeterminate sweep while the iframe does its first paint */
+@keyframes ps-load {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  49% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+.ps-load-bar {
+  animation: ps-load 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Mobile smooth touch scrolling & momentum optimization */
+.ck-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+}
+
+/* thin custom scrollbar for scroll containers */
+.ck-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.ck-scroll::-webkit-scrollbar-thumb {
+  background: #2e2e32;
+  border-radius: 99px;
+}
+.ck-scroll::-webkit-scrollbar-thumb:hover {
+  background: #3a6fff;
+}
+.ck-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* GPU hardware layer promotion for animated cards & tracks */
+.wv-card {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.cr-card,
+.cr-track {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

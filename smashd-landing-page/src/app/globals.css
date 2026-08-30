@@ -1,0 +1,287 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-grotesk);
+  --font-display: var(--font-anton);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ember: var(--ember);
+  --color-gold: var(--gold);
+  --color-smoke: var(--smoke);
+  --color-line: var(--line);
+}
+
+:root {
+  --background: #0a0705;
+  --foreground: #f5eee4;
+  --ink: #0a0705;
+  --ember: #ff5c1f;
+  --gold: #ffc24b;
+  --smoke: #8a7d6e;
+  --line: rgba(245, 238, 228, 0.12);
+}
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    background: var(--background);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-grotesk), system-ui, sans-serif;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--ember);
+    color: #0a0705;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0705;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2b2118;
+    border-radius: 99px;
+    border: 2px solid #0a0705;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--ember);
+  }
+}
+
+/* ---------- Typography utilities ---------- */
+.font-display {
+  font-family: var(--font-anton), Impact, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 2px var(--foreground);
+  color: transparent;
+}
+
+.text-stroke-ember {
+  -webkit-text-stroke: 2px var(--ember);
+  color: transparent;
+}
+
+@media (max-width: 768px) {
+  .text-stroke,
+  .text-stroke-ember {
+    -webkit-text-stroke-width: 1.2px;
+  }
+}
+
+/* ---------- Marquee ---------- */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-x var(--marquee-speed, 30s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-track.reverse {
+  animation-direction: reverse;
+}
+
+/* ---------- Grain overlay ---------- */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -100%;
+  z-index: 90;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  animation: grain-shift 0.9s steps(4) infinite;
+}
+
+@keyframes grain-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-2%, 3%);
+  }
+  50% {
+    transform: translate(3%, -2%);
+  }
+  75% {
+    transform: translate(-3%, -3%);
+  }
+  100% {
+    transform: translate(2%, 2%);
+  }
+}
+
+/* ---------- 3D burger ---------- */
+.burger-stage {
+  perspective: 1400px;
+}
+
+.burger-scene {
+  transform-style: preserve-3d;
+}
+
+.burger-layer {
+  position: absolute;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.burger-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ---------- Custom cursor ---------- */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--ember);
+  mix-blend-mode: normal;
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid rgba(245, 238, 228, 0.5);
+  mix-blend-mode: difference;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.35s;
+}
+
+.cursor-ring.is-active {
+  width: 88px;
+  height: 88px;
+  background: rgba(245, 238, 228, 0.92);
+  border-color: transparent;
+}
+
+.cursor-ring .cursor-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #0a0705;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.cursor-ring.is-active .cursor-label {
+  opacity: 1;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* ---------- Misc ---------- */
+.will-change-transform {
+  will-change: transform;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 16s linear infinite;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes scroll-drip {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+.scroll-line {
+  animation: scroll-drip 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .spin-slow,
+  .grain::after {
+    animation: none !important;
+  }
+}

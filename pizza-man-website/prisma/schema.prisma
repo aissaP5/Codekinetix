@@ -1,0 +1,151 @@
+/* ============================================================
+   Pizza-Man! — Prisma schema
+   ------------------------------------------------------------
+   This file is intentionally standalone:
+
+     • prisma / @prisma/client are NOT installed
+     • no database file, no server, no active .env config
+     • no migrations folder, no generated client
+
+   When you're ready to wire it up for real:
+
+     1. bun add prisma @prisma/client
+     2. create a .env with  DATABASE_URL="file:./db/pizza-man.db"
+        (SQLite, zero setup — or switch provider below to
+         "postgresql" and use a Postgres connection string)
+     3. bunx prisma db push        → creates the tables, no migration files
+     4. bunx prisma studio         → browse the data
+   ============================================================ */
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/* ------------------------------------------------------------
+   MENU — mirrors src/lib/menu-data.ts (MENU_ITEMS)
+   ------------------------------------------------------------ */
+
+/// One row per sellable item: pizzas, desserts, drinks and deals.
+/// Natural id = the slug used across the app ("margherita", "duo-crime"…).
+model MenuItem {
+  /// slug, e.g. "margherita", "pizza-man-special"
+  id          String  @id
+  name        String // "Captain Margherita"
+  description String
+  /// EUR, e.g. 8.9 → displayed as "€8.90" (formatPrice)
+  price       Float
+  /// "pizza" | "dessert" | "drink" | "deal"
+  category    String
+  /// Path under /public, e.g. "/menu/margherita.png" — null = Lucide icon fallback
+  image       String?
+  /// Icon key from DishIconName (src/lib/menu-data.ts):
+  /// "pizza" | "cheese" | "salad" | "flame" | "drumstick" | "truffle" | "fish"
+  /// | "rocket" | "cookie" | "coffee" | "citrus" | "soda" | "water" | "utensils"
+  icon        String  @default("pizza")
+  /// "Bestseller" | "Spicy" | "Veggie" | "New" | "Deal" — null = no badge
+  badge       String?
+  /// Lower = shown earlier on the /menu page
+  sortOrder   Int     @default(0)
+  available   Boolean @default(true)
+
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/* ------------------------------------------------------------
+   ORDERS — mirrors the cart checkout (src/lib/cart-store.tsx)
+   Delivery fee: FREE from €25 (FREE_SHIPPING_THRESHOLD), else €2.50
+   ------------------------------------------------------------ */
+
+model Order {
+  id        String @id @default(cuid())
+  /// Human-friendly code shown to the customer, e.g. "PM-7F3K2"
+  reference String @unique
+  /// "delivery" | "pickup"
+  fulfillment String @default("delivery")
+  /// Optional until a real checkout form exists (WhatsApp flow collects none)
+  customerName String?
+  phone        String?
+  /// Delivery address (null for pickup orders)
+  address String?
+  /// GPS pin captured in the cart drawer (reverse-geocoded address)
+  lat Float?
+  lng Float?
+  /// Kitchen / rider note ("extra chili, ring twice…")
+  note String?
+
+  subtotal    Float
+  /// 0 for pickup, 0 when subtotal ≥ €25, otherwise 2.5
+  deliveryFee Float @default(2.5)
+  total       Float
+  /// "PENDING" | "CONFIRMED" | "BAKING" | "ON_THE_WAY" | "DELIVERED" | "CANCELLED"
+  status String @default("PENDING")
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// One line of the cart. Name and price are snapshotted so past
+/// orders stay accurate even if the menu changes later.
+model OrderItem {
+  id      String @id @default(cuid())
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId String
+
+  /// Snapshot of MenuItem.name at order time
+  name String
+  /// Snapshot of MenuItem.price at order time (EUR)
+  unitPrice Float
+  quantity  Int   @default(1)
+  lineTotal Float // unitPrice × quantity
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+/* ------------------------------------------------------------
+   REVIEWS — the "Fan Mail" wall on the homepage
+   ------------------------------------------------------------ */
+
+model Review {
+  id      String @id @default(cuid())
+  author  String
+  /// 1–5 stars
+  rating  Int
+  comment String
+  /// Only displayed on the site once approved
+  approved Boolean @default(false)
+  /// Optional: a review tied to one item ("Best pizza ever!!" → Inferno)
+  menuItem   MenuItem? @relation(fields: [menuItemId], references: [id])
+  menuItemId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([menuItemId])
+}
+
+/* ------------------------------------------------------------
+   PIZZERIA — "Find Us" section data (PIZZERIA_HOURS)
+   ------------------------------------------------------------ */
+
+/// One opening-hours row, e.g. days "Monday — Thursday", hours "11:30 — 22:30"
+model OpeningHour {
+  id        String @id @default(cuid())
+  days      String
+  hours     String
+  /// Display order (Mon–Thu → Fri–Sat → Sun)
+  sortOrder Int    @default(0)
+}

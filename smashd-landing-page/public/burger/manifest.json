@@ -1,0 +1,65 @@
+{
+  "window": {
+    "x0": 150,
+    "x1": 1250,
+    "y0": 85,
+    "y1": 1000
+  },
+  "layers": {
+    "top_bun": {
+      "srcY": 85,
+      "srcYEnd": 445,
+      "cropX": 30,
+      "cropY": 1,
+      "w": 1042,
+      "h": 359
+    },
+    "lettuce": {
+      "srcY": 437,
+      "srcYEnd": 494,
+      "cropX": 30,
+      "cropY": 0,
+      "w": 1070,
+      "h": 57
+    },
+    "tomato": {
+      "srcY": 486,
+      "srcYEnd": 612,
+      "cropX": 35,
+      "cropY": 0,
+      "w": 1065,
+      "h": 126
+    },
+    "cheese": {
+      "srcY": 604,
+      "srcYEnd": 650,
+      "cropX": 68,
+      "cropY": 0,
+      "w": 981,
+      "h": 46
+    },
+    "patty": {
+      "srcY": 642,
+      "srcYEnd": 828,
+      "cropX": 0,
+      "cropY": 0,
+      "w": 1100,
+      "h": 186
+    },
+    "bottom_bun": {
+      "srcY": 820,
+      "srcYEnd": 1000,
+      "cropX": 0,
+      "cropY": 0,
+      "w": 1100,
+      "h": 180
+    },
+    "burger_full": {
+      "cropX": 0,
+      "cropY": 1,
+      "srcY": 85,
+      "w": 1100,
+      "h": 914
+    }
+  }
+}

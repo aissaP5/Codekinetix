@@ -1,0 +1,6 @@
+:HL["/projects/lumiere/_next/static/chunks/2chl7_vjqvqj8.css","style"]
+:HL["/projects/lumiere/_next/static/chunks/2dce1q1w3bc-q.css","style"]
+:HL["/projects/lumiere/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/projects/lumiere/_next/static/media/b67966e0b83b2cd0-s.p.0fuf3937kiol3.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/projects/lumiere/images/hero-studio.jpg","image",{"fetchPriority":"high"}]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}},"staleTime":300,"buildId":"Wrgw6_HqThRC658LAbs4e"}
