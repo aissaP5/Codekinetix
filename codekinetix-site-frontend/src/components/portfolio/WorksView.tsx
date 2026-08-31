@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { PROJECT_SLOTS, type ProjectSlot } from "@/lib/projects";
 import { useKinetix } from "@/lib/store";
+import { curtain } from "@/lib/curtain";
 
 /**
  * WORKS — pinned stacking cards.
@@ -78,12 +79,14 @@ function ProjectCard({
             src={slot.image}
             alt={slot.name}
             className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-            loading="lazy"
+            loading={index === 0 ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={index === 0 ? "high" : "low"}
           />
         </picture>
       )}
 
-      {/* ── FULL-BLEED VIDEO (hover) ── */}
+      {/* ── FULL-BLEED VIDEO (desktop hover only) ── */}
       {slot.video && (
         <video
           ref={videoRef}
@@ -92,7 +95,7 @@ function ProjectCard({
           loop
           playsInline
           preload="none"
-          className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500 opacity-0 group-hover:opacity-100 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500 opacity-0 group-hover:opacity-100 pointer-events-none hidden sm:block"
         />
       )}
 
@@ -150,129 +153,147 @@ export default function WorksView() {
   const totalCards = PROJECT_SLOTS.length + 1;
 
   useEffect(() => {
-    const root = rootRef.current;
-    const deck = deckRef.current;
-    if (!root || !deck) return;
-    const scrollerEl = root.closest("main") ?? undefined;
+    let ctx: gsap.Context | null = null;
+    let alive = true;
 
-    const ctx = gsap.context(() => {
-      /* header — masked char rise */
-      gsap.set(".wv-head-char", { yPercent: 115 });
-      gsap.set([".wv-head-label", ".wv-head-side"], { opacity: 0, y: 16 });
-      const tl = gsap.timeline({ delay: 0.05 });
-      tl.to(".wv-head-label", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" })
-        .to(".wv-head-char", { yPercent: 0, duration: 0.85, stagger: 0.06, ease: "power4.out" }, "-=0.2")
-        .to(".wv-head-side", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.4");
+    const init = () => {
+      if (!alive) return;
+      const root = rootRef.current;
+      const deck = deckRef.current;
+      if (!root || !deck) return;
+      const scrollerEl = root.closest("main") ?? undefined;
 
-      /* ── PINNED STACKING DECK ── */
-      const cards = gsap.utils.toArray<HTMLElement>(".wv-card");
+      ctx = gsap.context(() => {
+        /* header — masked char rise */
+        gsap.set(".wv-head-char", { yPercent: 115 });
+        gsap.set([".wv-head-label", ".wv-head-side"], { opacity: 0, y: 16 });
+        const tl = gsap.timeline({ delay: 0.05 });
+        tl.to(".wv-head-label", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" })
+          .to(".wv-head-char", { yPercent: 0, duration: 0.85, stagger: 0.06, ease: "power4.out" }, "-=0.2")
+          .to(".wv-head-side", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.4");
 
-      cards.forEach((card, i) => {
-        if (i > 0) {
-          gsap.set(card, { yPercent: 100 });
-        }
-      });
+        /* ── PINNED STACKING DECK ── */
+        const cards = gsap.utils.toArray<HTMLElement>(".wv-card");
 
-      const getStepDistance = () => (window.innerWidth < 640 ? 440 : 620);
+        cards.forEach((card, i) => {
+          if (i > 0) {
+            gsap.set(card, { yPercent: 100 });
+          }
+        });
 
-      const stackTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: deck,
-          scroller: scrollerEl,
-          start: "center center",
-          end: () => `+=${(totalCards - 1) * getStepDistance()}`,
-          pin: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          fastScrollEnd: true,
-          invalidateOnRefresh: true,
-        },
-      });
+        const getStepDistance = () => (window.innerWidth < 640 ? 440 : 620);
 
-      cards.forEach((card, i) => {
-        if (i === 0) return;
-        const prevCard = cards[i - 1];
-        const prevDim = prevCard.querySelector<HTMLElement>(".wv-dim");
-
-        stackTl.to(
-          prevCard,
-          {
-            scale: 0.94,
-            duration: 1,
-            ease: "power2.inOut",
+        const stackTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: deck,
+            scroller: scrollerEl,
+            start: "center center",
+            end: () => `+=${(totalCards - 1) * getStepDistance()}`,
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+            fastScrollEnd: true,
+            invalidateOnRefresh: true,
           },
-          (i - 1)
-        );
+        });
 
-        if (prevDim) {
+        cards.forEach((card, i) => {
+          if (i === 0) return;
+          const prevCard = cards[i - 1];
+          const prevDim = prevCard.querySelector<HTMLElement>(".wv-dim");
+
           stackTl.to(
-            prevDim,
+            prevCard,
             {
-              opacity: 0.65,
+              scale: 0.94,
               duration: 1,
               ease: "power2.inOut",
             },
             (i - 1)
           );
+
+          if (prevDim) {
+            stackTl.to(
+              prevDim,
+              {
+                opacity: 0.65,
+                duration: 1,
+                ease: "power2.inOut",
+              },
+              (i - 1)
+            );
+          }
+
+          stackTl.fromTo(
+            card,
+            { yPercent: 100 },
+            {
+              yPercent: 0,
+              duration: 1,
+              ease: "power2.inOut",
+            },
+            (i - 1)
+          );
+        });
+
+        /* pointer tilt */
+        let cleanupTilt = () => {};
+        if (window.matchMedia("(pointer: fine)").matches) {
+          const tilts = new Map<
+            HTMLElement,
+            { rx: (v: number) => void; ry: (v: number) => void }
+          >();
+          const onMove = (e: PointerEvent) => {
+            const card = (e.target as HTMLElement).closest?.(".wv-card") as HTMLElement | null;
+            if (!card) return;
+            let t = tilts.get(card);
+            if (!t) {
+              gsap.set(card, { transformPerspective: 900 });
+              t = {
+                rx: gsap.quickTo(card, "rotationX", { duration: 0.55, ease: "power3" }),
+                ry: gsap.quickTo(card, "rotationY", { duration: 0.55, ease: "power3" }),
+              };
+              tilts.set(card, t);
+            }
+            const r = card.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width - 0.5;
+            const py = (e.clientY - r.top) / r.height - 0.5;
+            t.ry(px * 3.5);
+            t.rx(-py * 3.5);
+          };
+          const onOut = (e: PointerEvent) => {
+            const card = (e.target as HTMLElement).closest?.(".wv-card") as HTMLElement | null;
+            if (!card || card.contains(e.relatedTarget as Node)) return;
+            const t = tilts.get(card);
+            if (t) {
+              t.rx(0);
+              t.ry(0);
+            }
+          };
+          root.addEventListener("pointermove", onMove, { passive: true });
+          root.addEventListener("pointerout", onOut, { passive: true });
+          cleanupTilt = () => {
+            root.removeEventListener("pointermove", onMove);
+            root.removeEventListener("pointerout", onOut);
+            tilts.clear();
+          };
         }
+        return cleanupTilt;
+      }, root);
+    };
 
-        stackTl.fromTo(
-          card,
-          { yPercent: 100 },
-          {
-            yPercent: 0,
-            duration: 1,
-            ease: "power2.inOut",
-          },
-          (i - 1)
-        );
+    if (curtain.isCovered()) {
+      curtain.whenUncovered().then(() => {
+        if (alive) init();
       });
+    } else {
+      init();
+    }
 
-      /* pointer tilt */
-      let cleanupTilt = () => {};
-      if (window.matchMedia("(pointer: fine)").matches) {
-        const tilts = new Map<
-          HTMLElement,
-          { rx: (v: number) => void; ry: (v: number) => void }
-        >();
-        const onMove = (e: PointerEvent) => {
-          const card = (e.target as HTMLElement).closest?.(".wv-card") as HTMLElement | null;
-          if (!card) return;
-          let t = tilts.get(card);
-          if (!t) {
-            gsap.set(card, { transformPerspective: 900 });
-            t = {
-              rx: gsap.quickTo(card, "rotationX", { duration: 0.55, ease: "power3" }),
-              ry: gsap.quickTo(card, "rotationY", { duration: 0.55, ease: "power3" }),
-            };
-            tilts.set(card, t);
-          }
-          const r = card.getBoundingClientRect();
-          const px = (e.clientX - r.left) / r.width - 0.5;
-          const py = (e.clientY - r.top) / r.height - 0.5;
-          t.ry(px * 3.5);
-          t.rx(-py * 3.5);
-        };
-        const onOut = (e: PointerEvent) => {
-          const card = (e.target as HTMLElement).closest?.(".wv-card") as HTMLElement | null;
-          if (!card || card.contains(e.relatedTarget as Node)) return;
-          const t = tilts.get(card);
-          if (t) {
-            t.rx(0);
-            t.ry(0);
-          }
-        };
-        root.addEventListener("pointermove", onMove);
-        root.addEventListener("pointerout", onOut);
-        cleanupTilt = () => {
-          root.removeEventListener("pointermove", onMove);
-          root.removeEventListener("pointerout", onOut);
-          tilts.clear();
-        };
-      }
-      return cleanupTilt;
-    }, root);
-    return () => ctx.revert();
+    return () => {
+      alive = false;
+      ctx?.revert();
+    };
   }, [totalCards]);
 
   return (

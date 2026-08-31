@@ -1264,21 +1264,47 @@
 
     // ====== Preloader ======
     const preloaderChars = document.querySelectorAll('#preloader-title .char');
+    const heroChars = document.querySelectorAll('#hero-title .char');
+
+    // Immediately prepare initial states under the preloader so it NEVER flashes or double-loads
     gsap.set(preloaderChars, { yPercent: 110 });
+    gsap.set(heroChars, { yPercent: 110 });
+    gsap.set('.hero-img', { scale: 1.15 });
+    gsap.set('#hero-meta > *', { y: 30, opacity: 0 });
+    gsap.set('#hero-bottom > *', { y: 30, opacity: 0 });
+    gsap.set('#main-nav', { y: -80, opacity: 0 });
+
+    let heroStarted = false;
+    function startHeroAnimations() {
+      if (heroStarted) return;
+      heroStarted = true;
+      document.body.classList.remove('loading');
+
+      const heroTl = gsap.timeline();
+      heroTl.to('.hero-img', { scale: 1, duration: 1.8, ease: 'expo.out' })
+        .to(heroChars, { yPercent: 0, duration: 1.1, stagger: 0.05, ease: 'expo.out' }, 0.1)
+        .to('#hero-meta > *', { y: 0, opacity: 1, duration: 0.7, stagger: 0.08, ease: 'power3.out' }, 0.3)
+        .to('#hero-bottom > *', { y: 0, opacity: 1, duration: 0.7, stagger: 0.08, ease: 'power3.out' }, 0.45)
+        .to('#main-nav', { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }, 0.3);
+
+      gsap.to('.hero-img', {
+        yPercent: 15, ease: 'none',
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+      });
+    }
 
     let preloaderDismissed = false;
     function dismissPreloader() {
       if (preloaderDismissed) return;
       preloaderDismissed = true;
-      document.body.classList.remove('loading');
       const pl = document.getElementById('preloader');
       if (pl) pl.style.display = 'none';
-      initHeroAnimations();
+      startHeroAnimations();
       ScrollTrigger.refresh();
     }
 
-    // Failsafe timer so preloader never gets stuck under any circumstances
-    const preloaderFailsafe = setTimeout(dismissPreloader, 3500);
+    // Failsafe timer
+    const preloaderFailsafe = setTimeout(dismissPreloader, 2000);
 
     const preloaderTl = gsap.timeline({
       onComplete: () => {
@@ -1287,29 +1313,18 @@
       }
     });
 
+    // Snappy, modern preloader: quick letters pop in + bar fills + preloader slides up
     preloaderTl.to(preloaderChars, {
-      yPercent: 0, duration: 1, stagger: 0.07, ease: 'expo.out', delay: 0.2
-    }).to('.preloader-bar-fill', { scaleX: 1, duration: 1, ease: 'power2.inOut' }, '-=0.8')
+      yPercent: 0, duration: 0.55, stagger: 0.04, ease: 'expo.out', delay: 0.05
+    }).to('.preloader-bar-fill', { scaleX: 1, duration: 0.5, ease: 'power2.inOut' }, '-=0.35')
       .to('#preloader', {
-        yPercent: -100, duration: 1.1, ease: 'expo.inOut', delay: 0.4
-      }, '-=0.2');
-
-    // ====== Hero ======
-    function initHeroAnimations() {
-      const heroChars = document.querySelectorAll('#hero-title .char');
-      gsap.set(heroChars, { yPercent: 110 });
-      const heroTl = gsap.timeline();
-      heroTl.to('.hero-img', { scale: 1, duration: 2.5, ease: 'expo.out' })
-        .to(heroChars, { yPercent: 0, duration: 1.4, stagger: 0.08, ease: 'expo.out' }, '-=2.2')
-        .from('#hero-meta > *', { y: 30, opacity: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out' }, '-=1.4')
-        .from('#hero-bottom > *', { y: 30, opacity: 0, duration: 0.9, stagger: 0.15, ease: 'power3.out' }, '-=0.8')
-        .from('#main-nav', { y: -100, opacity: 0, duration: 1, ease: 'power3.out' }, '-=1');
-
-      gsap.to('.hero-img', {
-        yPercent: 15, ease: 'none',
-        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
-      });
-    }
+        yPercent: -100,
+        duration: 0.75,
+        ease: 'expo.inOut',
+        onStart: () => {
+          startHeroAnimations();
+        }
+      }, '+=0.1');
 
     // ====== Nav scroll state ======
     ScrollTrigger.create({

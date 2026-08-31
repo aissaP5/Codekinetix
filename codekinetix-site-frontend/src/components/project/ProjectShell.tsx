@@ -89,46 +89,16 @@ export default function ProjectShell() {
       </div>
 
       {/* the project itself — embedded build */}
-      <div className="ps-frame relative flex-1 min-h-0 bg-bone">
+      <div className="ps-frame relative flex-1 min-h-0 bg-void">
         {phase === "project" && (
           <iframe
             src={slot.path}
             title={`${slot.name} — embedded project`}
-            className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-700 ${
-              loaded ? "opacity-100" : "opacity-0"
-            }`}
+            className="absolute inset-0 h-full w-full border-0"
             onLoad={() => setLoaded(true)}
             allow="clipboard-write"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
           />
-        )}
-
-        {/* loading plate — covers the iframe until its first paint */}
-        {!loaded && (
-          <div className="absolute inset-0 grid place-items-center bg-void text-bone">
-            <div className="bg-grid-dark absolute inset-0 pointer-events-none" aria-hidden="true" />
-
-            {/* corner ticks */}
-            <span className="absolute top-5 left-5 w-3 h-3 border-t border-l border-bone/25" aria-hidden="true" />
-            <span className="absolute top-5 right-5 w-3 h-3 border-t border-r border-bone/25" aria-hidden="true" />
-            <span className="absolute bottom-5 left-5 w-3 h-3 border-b border-l border-bone/25" aria-hidden="true" />
-            <span className="absolute bottom-5 right-5 w-3 h-3 border-b border-r border-bone/25" aria-hidden="true" />
-
-            <div className="relative text-center px-6">
-              <p className="font-mono text-[10px] tracking-[0.35em] text-ash mb-5">
-                {slot.index} — {slot.tagline}
-              </p>
-              <h2 className="font-extrabold type-xwide uppercase leading-none tracking-[-0.02em] text-[10vw] sm:text-[5vw] mb-7">
-                {slot.name}
-              </h2>
-              <div className="mx-auto h-[3px] w-[min(60vw,320px)] bg-bone/15 overflow-hidden">
-                <div className="ps-load-bar h-full w-full origin-left bg-volt" />
-              </div>
-              <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-ash">
-                LOADING PROJECT
-              </p>
-            </div>
-          </div>
         )}
       </div>
     </div>

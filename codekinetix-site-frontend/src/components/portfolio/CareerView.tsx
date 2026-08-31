@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { useKinetix } from "@/lib/store";
+import { curtain } from "@/lib/curtain";
 
 /**
  * CAREER — the timeline goes sideways.
@@ -31,13 +32,17 @@ const STYLE: Record<string, { card: string; year: string; meta: string; chip: st
 export default function CareerView() {
   const rootRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const scrollerEl = root.closest("main") ?? undefined;
+    let ctx: gsap.Context | null = null;
+    let alive = true;
 
-    const ctx = gsap.context(() => {
+    const init = () => {
+      if (!alive) return;
+      const root = rootRef.current;
+      if (!root) return;
+      const scrollerEl = root.closest("main") ?? undefined;
+
+      ctx = gsap.context(() => {
       /* header — chars tumble in */
       gsap.set(".cr-char", { yPercent: 130, rotation: () => gsap.utils.random(-18, 18) });
       gsap.fromTo(
@@ -175,17 +180,30 @@ export default function CareerView() {
             t.ry(0);
           }
         };
-        root.addEventListener("pointermove", onMove);
-        root.addEventListener("pointerout", onOut);
-        cleanupTilt = () => {
-          root.removeEventListener("pointermove", onMove);
-          root.removeEventListener("pointerout", onOut);
-          tilts.clear();
-        };
-      }
-      return cleanupTilt;
-    }, root);
-    return () => ctx.revert();
+          root.addEventListener("pointermove", onMove, { passive: true });
+          root.addEventListener("pointerout", onOut, { passive: true });
+          cleanupTilt = () => {
+            root.removeEventListener("pointermove", onMove);
+            root.removeEventListener("pointerout", onOut);
+            tilts.clear();
+          };
+        }
+        return cleanupTilt;
+      }, root);
+    };
+
+    if (curtain.isCovered()) {
+      curtain.whenUncovered().then(() => {
+        if (alive) init();
+      });
+    } else {
+      init();
+    }
+
+    return () => {
+      alive = false;
+      ctx?.revert();
+    };
   }, []);
 
   const headerLines: [string, boolean][] = [
@@ -202,7 +220,7 @@ export default function CareerView() {
         </p>
         <h2 className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.02em] text-[13vw] sm:text-[9vw]">
           {headerLines.map(([line, isOutline], li) => (
-            <span key={li} className="block overflow-hidden pb-1">
+            <span key={li} className="block overflow-hidden pb-1 whitespace-nowrap">
               {line.split("").map((ch, i) => (
                 <span
                   key={i}

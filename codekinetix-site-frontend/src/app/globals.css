@@ -343,6 +343,7 @@
   will-change: transform, opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
+  contain: layout paint style;
 }
 
 .cr-card,
@@ -350,4 +351,5 @@
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
+  contain: layout paint style;
 }

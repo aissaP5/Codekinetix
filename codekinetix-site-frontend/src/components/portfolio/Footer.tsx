@@ -166,9 +166,6 @@ export default function Footer() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 mt-6 font-mono text-[10px] text-bone/30 tracking-wide">
           <span>© {new Date().getFullYear()} CODEKINETIX®</span>
-          <span>
-            BLACK · <span className="text-volt">VOLT</span> · FLAME
-          </span>
         </div>
       </div>
     </footer>
