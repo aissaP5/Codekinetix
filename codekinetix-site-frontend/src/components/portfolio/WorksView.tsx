@@ -65,7 +65,7 @@ function ProjectCard({
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left focus-visible:outline-2 focus-visible:outline-volt transition-shadow duration-500 hover:volt-glow active:volt-glow border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform"
+      className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left focus-visible:outline-2 focus-visible:outline-volt sm:hover:volt-glow sm:active:volt-glow border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform [-webkit-tap-highlight-color:transparent] [touch-action:pan-y] select-none"
       style={{ zIndex: index + 1 }}
       aria-label={`Open the ${slot.name} project`}
     >
@@ -78,7 +78,7 @@ function ProjectCard({
           <img
             src={slot.image}
             alt={slot.name}
-            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            className="absolute inset-0 w-full h-full object-cover object-top sm:transition-transform sm:duration-700 sm:ease-out sm:group-hover:scale-[1.03]"
             loading={index === 0 ? "eager" : "lazy"}
             decoding="async"
             fetchPriority={index === 0 ? "high" : "low"}
@@ -131,7 +131,7 @@ function ProjectCard({
 
       {/* Shine sweep */}
       <span
-        className="pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-bone/15 to-transparent -translate-x-[320%] group-hover:translate-x-[420%] transition-transform duration-[1100ms] ease-out"
+        className="pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-bone/15 to-transparent -translate-x-[320%] group-hover:translate-x-[420%] transition-transform duration-[1100ms] ease-out hidden sm:block"
         aria-hidden="true"
       />
 
@@ -146,9 +146,9 @@ function ProjectCard({
 
 export default function WorksView() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const deckRef = useRef<HTMLDivElement>(null);
   const openProject = useKinetix((s) => s.openProject);
-
 
   const totalCards = PROJECT_SLOTS.length + 1;
 
@@ -159,8 +159,9 @@ export default function WorksView() {
     const init = () => {
       if (!alive) return;
       const root = rootRef.current;
+      const wrap = wrapRef.current;
       const deck = deckRef.current;
-      if (!root || !deck) return;
+      if (!root || !wrap || !deck) return;
       const scrollerEl = root.closest("main") ?? undefined;
 
       ctx = gsap.context(() => {
@@ -172,7 +173,7 @@ export default function WorksView() {
           .to(".wv-head-char", { yPercent: 0, duration: 0.85, stagger: 0.06, ease: "power4.out" }, "-=0.2")
           .to(".wv-head-side", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, "-=0.4");
 
-        /* ── PINNED STACKING DECK ── */
+        /* ── STACKING DECK DRIVEN BY WRAPPER SCROLL ── */
         const cards = gsap.utils.toArray<HTMLElement>(".wv-card");
 
         cards.forEach((card, i) => {
@@ -181,17 +182,13 @@ export default function WorksView() {
           }
         });
 
-        const getStepDistance = () => (window.innerWidth < 640 ? 440 : 620);
-
         const stackTl = gsap.timeline({
           scrollTrigger: {
-            trigger: deck,
+            trigger: wrap,
             scroller: scrollerEl,
-            start: "center center",
-            end: () => `+=${(totalCards - 1) * getStepDistance()}`,
-            pin: true,
-            scrub: 0.5,
-            anticipatePin: 1,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.4,
             fastScrollEnd: true,
             invalidateOnRefresh: true,
           },
@@ -236,7 +233,7 @@ export default function WorksView() {
           );
         });
 
-        /* pointer tilt */
+        /* pointer tilt — desktop only */
         let cleanupTilt = () => {};
         if (window.matchMedia("(pointer: fine)").matches) {
           const tilts = new Map<
@@ -322,67 +319,69 @@ export default function WorksView() {
         </p>
       </div>
 
-      {/* ── THE PINNED DECK — vertical card proportion on mobile, balanced on desktop ── */}
-      <div className="px-4 sm:px-8">
-        <div
-          ref={deckRef}
-          className="relative w-full max-w-5xl h-[58vh] sm:h-[68vh] mx-auto overflow-hidden rounded-xl shadow-2xl"
-        >
-          {PROJECT_SLOTS.map((slot, i) => {
-            const t = TREATMENTS[i % TREATMENTS.length];
-            return (
-              <ProjectCard
-                key={slot.id}
-                slot={slot}
-                index={i}
-                treatment={t}
-                openProject={openProject}
-              />
-            );
-          })}
-
-          {/* Open slot — final card */}
-          <a
-            href="mailto:codekinetixstudio@gmail.com"
-            className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group block text-left focus-visible:outline-2 focus-visible:outline-volt transition-shadow duration-500 hover:volt-glow active:volt-glow [-webkit-tap-highlight-color:transparent] [touch-action:manipulation]"
-            style={{ zIndex: totalCards }}
-            aria-label="Start a project — send an email"
+      {/* ── THE PINNED DECK — compositor-native sticky wrap for silky-smooth mobile scrolling ── */}
+      <div ref={wrapRef} className="wv-stack-wrap relative h-[280vh] sm:h-[380vh]">
+        <div className="sticky top-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-80px)] flex flex-col justify-center px-4 sm:px-8">
+          <div
+            ref={deckRef}
+            className="relative w-full max-w-5xl h-[58vh] sm:h-[68vh] mx-auto overflow-hidden rounded-xl shadow-2xl"
           >
-            <div className="absolute inset-0 bg-volt" />
-            <div className="wv-dim pointer-events-none absolute inset-0 bg-void opacity-0 z-[12]" />
-            <div className="relative z-10 h-full flex flex-col justify-between p-4 sm:p-8 text-void">
-              <div className="flex items-center justify-between gap-2 font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-void/70">
-                <span className="border border-void/30 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded">SLOT {String(totalCards).padStart(2, "0")} — OPEN</span>
-                <span className="truncate">ONE CLIENT PER QUARTER</span>
-              </div>
+            {PROJECT_SLOTS.map((slot, i) => {
+              const t = TREATMENTS[i % TREATMENTS.length];
+              return (
+                <ProjectCard
+                  key={slot.id}
+                  slot={slot}
+                  index={i}
+                  treatment={t}
+                  openProject={openProject}
+                />
+              );
+            })}
 
-              <div className="relative grid place-items-center flex-1 overflow-hidden py-2">
-                <div className="text-center group-hover:scale-[1.03] transition-transform duration-700 select-none">
-                  <span className="font-extrabold type-xwide uppercase leading-[0.88] block text-[clamp(3.2rem,14vw,8rem)] tracking-[-0.02em]">
-                    YOURS
+            {/* Open slot — final card */}
+            <a
+              href="mailto:codekinetixstudio@gmail.com"
+              className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group block text-left focus-visible:outline-2 focus-visible:outline-volt sm:hover:volt-glow sm:active:volt-glow border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform [-webkit-tap-highlight-color:transparent] [touch-action:pan-y] select-none"
+              style={{ zIndex: totalCards }}
+              aria-label="Start a project — send an email"
+            >
+              <div className="absolute inset-0 bg-volt" />
+              <div className="wv-dim pointer-events-none absolute inset-0 bg-void opacity-0 z-[12]" />
+              <div className="relative z-10 h-full flex flex-col justify-between p-4 sm:p-8 text-void">
+                <div className="flex items-center justify-between gap-2 font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-void/70">
+                  <span className="border border-void/30 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded">SLOT {String(totalCards).padStart(2, "0")} — OPEN</span>
+                  <span className="truncate">ONE CLIENT PER QUARTER</span>
+                </div>
+
+                <div className="relative grid place-items-center flex-1 overflow-hidden py-2">
+                  <div className="text-center group-hover:scale-[1.03] transition-transform duration-700 select-none">
+                    <span className="font-extrabold type-xwide uppercase leading-[0.88] block text-[clamp(3.2rem,14vw,8rem)] tracking-[-0.02em]">
+                      YOURS
+                    </span>
+                    <span className="font-serif italic font-normal normal-case block text-[clamp(1.4rem,5.5vw,3.2rem)] text-void/80 mt-1">
+                      maybe
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-2 bg-void text-volt font-mono text-[9px] sm:text-[11px] font-bold tracking-[0.12em] sm:tracking-[0.15em] px-3.5 py-2 sm:px-5 sm:py-3 rounded-full group-hover:gap-3 transition-all duration-400">
+                    START A PROJECT
+                    <span aria-hidden="true">↗</span>
                   </span>
-                  <span className="font-serif italic font-normal normal-case block text-[clamp(1.4rem,5.5vw,3.2rem)] text-void/80 mt-1">
-                    maybe
+                  <span className="font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-void/70">
+                    FIXED QUOTE IN 48H
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-2 bg-void text-volt font-mono text-[9px] sm:text-[11px] font-bold tracking-[0.12em] sm:tracking-[0.15em] px-3.5 py-2 sm:px-5 sm:py-3 rounded-full group-hover:gap-3 transition-all duration-400">
-                  START A PROJECT
-                  <span aria-hidden="true">↗</span>
-                </span>
-                <span className="font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-void/70">
-                  FIXED QUOTE IN 48H
-                </span>
-              </div>
-            </div>
-
-            <span className="absolute top-2.5 left-2.5 w-2.5 h-2.5 border-t border-l border-void/40 pointer-events-none" aria-hidden="true" />
-            <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 border-t border-r border-void/40 pointer-events-none" aria-hidden="true" />
-            <span className="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 border-b border-l border-void/40 pointer-events-none" aria-hidden="true" />
-            <span className="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 border-b border-r border-void/40 pointer-events-none" aria-hidden="true" />
-          </a>
+              <span className="absolute top-2.5 left-2.5 w-2.5 h-2.5 border-t border-l border-void/40 pointer-events-none" aria-hidden="true" />
+              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 border-t border-r border-void/40 pointer-events-none" aria-hidden="true" />
+              <span className="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 border-b border-l border-void/40 pointer-events-none" aria-hidden="true" />
+              <span className="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 border-b border-r border-void/40 pointer-events-none" aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
