@@ -151,7 +151,7 @@ export default function CareerView() {
       if (window.matchMedia("(pointer: fine)").matches) {
         const tilts = new Map<
           HTMLElement,
-          { rx: (v: number) => void; ry: (v: number) => void }
+          { rx: (v: number) => void; ry: (v: number) => void; rect: DOMRect | null }
         >();
         const onMove = (e: PointerEvent) => {
           const card = (e.target as HTMLElement).closest?.(".cr-card") as HTMLElement | null;
@@ -162,10 +162,11 @@ export default function CareerView() {
             t = {
               rx: gsap.quickTo(card, "rotationX", { duration: 0.55, ease: "power3" }),
               ry: gsap.quickTo(card, "rotationY", { duration: 0.55, ease: "power3" }),
+              rect: card.getBoundingClientRect(),
             };
             tilts.set(card, t);
           }
-          const r = card.getBoundingClientRect();
+          const r = t.rect ?? (t.rect = card.getBoundingClientRect());
           const px = (e.clientX - r.left) / r.width - 0.5;
           const py = (e.clientY - r.top) / r.height - 0.5;
           t.ry(px * 7);
@@ -176,18 +177,19 @@ export default function CareerView() {
           if (!card || card.contains(e.relatedTarget as Node)) return;
           const t = tilts.get(card);
           if (t) {
+            t.rect = null;
             t.rx(0);
             t.ry(0);
           }
         };
-          root.addEventListener("pointermove", onMove, { passive: true });
-          root.addEventListener("pointerout", onOut, { passive: true });
-          cleanupTilt = () => {
-            root.removeEventListener("pointermove", onMove);
-            root.removeEventListener("pointerout", onOut);
-            tilts.clear();
-          };
-        }
+        root.addEventListener("pointermove", onMove, { passive: true });
+        root.addEventListener("pointerout", onOut, { passive: true });
+        cleanupTilt = () => {
+          root.removeEventListener("pointermove", onMove);
+          root.removeEventListener("pointerout", onOut);
+          tilts.clear();
+        };
+      }
         return cleanupTilt;
       }, root);
     };

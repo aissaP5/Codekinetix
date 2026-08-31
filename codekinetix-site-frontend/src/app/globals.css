@@ -353,3 +353,11 @@
   backface-visibility: hidden;
   contain: layout paint style;
 }
+
+/* Performance: skip layout/paint for off-screen sections until near viewport */
+.av-stats,
+.av-cta,
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}

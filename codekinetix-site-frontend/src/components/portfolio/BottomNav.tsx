@@ -43,7 +43,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50"
+      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto"
       aria-label="Main sections"
     >
       <div className="flex items-center bg-void text-bone rounded-full px-2 py-2 border border-bone/15 shadow-[0_12px_44px_rgba(0,0,0,0.6),0_0_34px_rgba(58,111,255,0.28)]">
