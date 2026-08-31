@@ -52,23 +52,35 @@ function ProjectCard({
     }
   };
 
+  const handleClick = () => {
+    if (slot.video && videoRef.current) {
+      videoRef.current.pause();
+    }
+    openProject(slot.id);
+  };
+
   return (
     <button
-      onClick={() => openProject(slot.id)}
+      onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left focus-visible:outline-2 focus-visible:outline-volt transition-shadow duration-500 hover:volt-glow active:volt-glow border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform"
       style={{ zIndex: index + 1 }}
       aria-label={`Open the ${slot.name} project`}
     >
-      {/* ── FULL-BLEED SCREENSHOT ── */}
+      {/* ── FULL-BLEED SCREENSHOT — mobile-native portrait on small screens ── */}
       {slot.image && (
-        <img
-          src={slot.image}
-          alt={slot.name}
-          className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-          loading="lazy"
-        />
+        <picture>
+          {slot.mobileImage && (
+            <source media="(max-width: 639px)" srcSet={slot.mobileImage} />
+          )}
+          <img
+            src={slot.image}
+            alt={slot.name}
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            loading="lazy"
+          />
+        </picture>
       )}
 
       {/* ── FULL-BLEED VIDEO (hover) ── */}
@@ -89,22 +101,22 @@ function ProjectCard({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 sm:h-24 bg-gradient-to-t from-void/75 to-transparent" />
 
       {/* ── TOP ROW ── */}
-      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-4 sm:px-7 pt-4 sm:pt-6 font-mono text-[9px] sm:text-[10px] tracking-[0.3em]">
-        <span className={`border px-3 py-1.5 backdrop-blur-md bg-void/50 rounded ${treatment.chip}`}>
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-2 px-3 sm:px-7 pt-3 sm:pt-6 font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em]">
+        <span className={`border px-2.5 py-1 sm:px-3 sm:py-1.5 bg-void/85 sm:bg-void/60 sm:backdrop-blur-md rounded ${treatment.chip}`}>
           {slot.index} — {slot.name}
         </span>
-        <span className={`backdrop-blur-md bg-void/50 px-2.5 py-1 rounded ${treatment.meta}`}>
+        <span className={`bg-void/85 sm:bg-void/60 sm:backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 rounded truncate max-w-[140px] sm:max-w-none ${treatment.meta}`}>
           {slot.tagline}
         </span>
       </div>
 
       {/* ── BOTTOM ROW ── */}
-      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-3 px-4 sm:px-7 pb-4 sm:pb-6">
-        <span className={`font-mono text-[9px] sm:text-[10px] tracking-[0.3em] backdrop-blur-md bg-void/50 px-3 py-1.5 rounded border border-bone/10 ${treatment.meta}`}>
+      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-2 px-3 sm:px-7 pb-3 sm:pb-6">
+        <span className={`font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] bg-void/85 sm:bg-void/60 sm:backdrop-blur-md px-2.5 py-1 sm:px-3 sm:py-1.5 rounded border border-bone/10 ${treatment.meta}`}>
           {slot.meta}
         </span>
         <span
-          className="grid place-items-center w-10 h-10 sm:w-12 sm:h-12 border border-bone/30 backdrop-blur-md bg-void/50 text-bone font-bold text-base sm:text-lg rounded-full group-hover:rotate-45 group-hover:bg-volt group-hover:text-void group-hover:border-volt transition-all duration-500"
+          className="grid place-items-center w-8 h-8 sm:w-12 sm:h-12 border border-bone/30 bg-void/85 sm:bg-void/60 sm:backdrop-blur-md text-bone font-bold text-sm sm:text-lg rounded-full group-hover:rotate-45 group-hover:bg-volt group-hover:text-void group-hover:border-volt transition-all duration-500"
           aria-hidden="true"
         >
           ↗
@@ -266,9 +278,9 @@ export default function WorksView() {
   return (
     <div ref={rootRef} className="pt-8 sm:pt-14 pb-20">
       {/* header */}
-      <div className="px-4 sm:px-8 max-w-6xl mx-auto mb-10 sm:mb-12 flex flex-wrap items-end justify-between gap-6">
+      <div className="px-4 sm:px-8 max-w-6xl mx-auto mb-8 sm:mb-12 flex flex-wrap items-end justify-between gap-4 sm:gap-6">
         <div>
-          <p className="wv-head-label font-mono text-[10px] tracking-[0.3em] text-ash mb-3 sm:mb-4">
+          <p className="wv-head-label font-mono text-[10px] tracking-[0.3em] text-ash mb-2 sm:mb-4">
             <span className="text-volt font-bold">02</span> — WORKS
           </p>
           <h2 className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.02em] text-[13vw] sm:text-[8vw]">
@@ -284,16 +296,16 @@ export default function WorksView() {
             </span>
           </h2>
         </div>
-        <p className="wv-head-side max-w-[230px] font-mono text-[10px] leading-relaxed text-ash">
+        <p className="wv-head-side max-w-[230px] font-mono text-[9px] sm:text-[10px] leading-relaxed text-ash">
           EVERY PROJECT OPENS INSIDE THIS SITE — CLICK A CARD AND STEP IN.
         </p>
       </div>
 
-      {/* ── THE PINNED DECK — centered, balanced width and height ── */}
+      {/* ── THE PINNED DECK — vertical card proportion on mobile, balanced on desktop ── */}
       <div className="px-4 sm:px-8">
         <div
           ref={deckRef}
-          className="relative w-full max-w-5xl h-[62vh] sm:h-[68vh] mx-auto overflow-hidden rounded-xl shadow-2xl"
+          className="relative w-full max-w-5xl h-[58vh] sm:h-[68vh] mx-auto overflow-hidden rounded-xl shadow-2xl"
         >
           {PROJECT_SLOTS.map((slot, i) => {
             const t = TREATMENTS[i % TREATMENTS.length];
@@ -317,27 +329,29 @@ export default function WorksView() {
           >
             <div className="absolute inset-0 bg-volt" />
             <div className="wv-dim pointer-events-none absolute inset-0 bg-void opacity-0 z-[12]" />
-            <div className="relative z-10 h-full flex flex-col justify-between p-5 sm:p-8 text-void">
-              <div className="flex items-center justify-between gap-3 font-mono text-[9px] sm:text-[10px] tracking-[0.3em] text-void/70">
-                <span className="border border-void/30 px-3 py-1.5 rounded">SLOT {String(totalCards).padStart(2, "0")} — OPEN</span>
-                <span>ONE CLIENT PER QUARTER</span>
+            <div className="relative z-10 h-full flex flex-col justify-between p-4 sm:p-8 text-void">
+              <div className="flex items-center justify-between gap-2 font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-void/70">
+                <span className="border border-void/30 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded">SLOT {String(totalCards).padStart(2, "0")} — OPEN</span>
+                <span className="truncate">ONE CLIENT PER QUARTER</span>
               </div>
 
-              <div className="relative grid place-items-center flex-1 overflow-hidden">
-                <span className="font-extrabold type-xwide uppercase leading-none select-none text-center text-[15vw] sm:text-[10vw] group-hover:scale-[1.03] transition-transform duration-700">
-                  <span className="block sm:inline">YOURS</span>
-                  <span className="font-serif italic font-normal normal-case block text-[0.47em] mt-1 sm:mt-0 sm:inline sm:ml-2 sm:align-middle">
+              <div className="relative grid place-items-center flex-1 overflow-hidden py-2">
+                <div className="text-center group-hover:scale-[1.03] transition-transform duration-700 select-none">
+                  <span className="font-extrabold type-xwide uppercase leading-[0.88] block text-[clamp(3.2rem,14vw,8rem)] tracking-[-0.02em]">
+                    YOURS
+                  </span>
+                  <span className="font-serif italic font-normal normal-case block text-[clamp(1.4rem,5.5vw,3.2rem)] text-void/80 mt-1">
                     maybe
                   </span>
-                </span>
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-3 bg-void text-volt font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.15em] px-5 py-3 rounded-full group-hover:gap-4 transition-all duration-400">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-2 bg-void text-volt font-mono text-[9px] sm:text-[11px] font-bold tracking-[0.12em] sm:tracking-[0.15em] px-3.5 py-2 sm:px-5 sm:py-3 rounded-full group-hover:gap-3 transition-all duration-400">
                   START A PROJECT
                   <span aria-hidden="true">↗</span>
                 </span>
-                <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.3em] text-void/70">
+                <span className="font-mono text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-void/70">
                   FIXED QUOTE IN 48H
                 </span>
               </div>

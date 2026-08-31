@@ -56,10 +56,14 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer id="contact" ref={rootRef} className="relative bg-void text-bone">
+    <footer
+      id="contact"
+      ref={rootRef}
+      className="relative bg-void text-bone [content-visibility:auto] [contain-intrinsic-size:auto_600px]"
+    >
       {/* volt crown */}
       <div className="h-[3px] w-full bg-volt" aria-hidden="true" />
-      <div className="bg-grid-dark absolute inset-0 pointer-events-none" aria-hidden="true" />
+      <div className="bg-grid-dark absolute inset-0 pointer-events-none mobile-hide-overlay" aria-hidden="true" />
 
       <div className="relative z-10 px-4 sm:px-8 pt-14 sm:pt-20 pb-40">
         <p className="ft-reveal font-mono text-[10px] tracking-[0.3em] text-volt mb-4">

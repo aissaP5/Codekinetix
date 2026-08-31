@@ -2,10 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { HERO_BURGER } from "@/lib/burger";
-
-gsap.registerPlugin(DrawSVGPlugin);
 
 const LINE_ART = [
   // dome
@@ -89,7 +86,7 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
     const safety = window.setTimeout(finish, 8000);
 
     /* initial states (matching units so the wipe interpolates smoothly) */
-    gsap.set(".draw-line", { drawSVG: "0%" });
+    gsap.set(".draw-line", { strokeDashoffset: 1 });
     gsap.set(root, { clipPath: "inset(0% 0% 0% 0%)" });
     /* counter jumps to a live value immediately — never a static 0 frame */
     counter.v = 1;
@@ -100,9 +97,9 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
     stageA
       .fromTo(
         ".draw-line",
-        { drawSVG: "0%" },
+        { strokeDashoffset: 1 },
         {
-          drawSVG: "100%",
+          strokeDashoffset: 0,
           duration: 0.55 / speed,
           stagger: 0.09 / speed,
           ease: "power2.inOut",
@@ -197,6 +194,9 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
               stroke="#ff5c1f"
               strokeWidth="3.5"
               strokeLinecap="round"
+              pathLength={1}
+              strokeDasharray="1"
+              strokeDashoffset="1"
             />
           ))}
         </svg>

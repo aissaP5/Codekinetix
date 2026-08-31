@@ -53,10 +53,34 @@ export default function Marquee({
     let writtenRate = 1;
     let writtenSkew = false;
 
+    let isIntersecting = true;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          isIntersecting = en.isIntersecting;
+          if (track) {
+            track.style.animationPlayState = isIntersecting ? "running" : "paused";
+          }
+          if (isIntersecting) {
+            wake();
+          } else if (raf) {
+            cancelAnimationFrame(raf);
+            raf = 0;
+          }
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(track);
+
     /* the CSS loop keeps the band moving compositor-side; the JS layer
        only wakes while scroll momentum exists, then parks itself —
        zero per-frame JS at rest (low-end friendly). */
     const tick = () => {
+      if (!isIntersecting) {
+        raf = 0;
+        return;
+      }
       const top = scroller.scrollTop;
       vel += (top - lastTop) * 0.6; // scroll impulse
       vel *= 0.9; // smooth decay
@@ -94,12 +118,14 @@ export default function Marquee({
       raf = settled ? 0 : requestAnimationFrame(tick);
     };
     const wake = () => {
+      if (!isIntersecting) return;
       if (!raf) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     scroller.addEventListener("scroll", wake, { passive: true });
 
     return () => {
+      io.disconnect();
       cancelAnimationFrame(raf);
       scroller.removeEventListener("scroll", wake);
       skew.style.transform = "";

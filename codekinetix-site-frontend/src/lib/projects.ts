@@ -13,6 +13,7 @@ export interface ProjectSlot {
   meta: string; // stack / context line, card bottom-left
   path: string; // embedded build served from public/
   image?: string;
+  mobileImage?: string;
   video?: string;
   span: "wide" | "tall" | "normal";
 }
@@ -26,6 +27,7 @@ export const PROJECT_SLOTS: ProjectSlot[] = [
     meta: "BEAUTY — NEXT.JS",
     path: "/projects/lumea/index.html",
     image: "/media/Lumea.png",
+    mobileImage: "/media/Lumea-mobile.png",
     video: "/media/lumea.mov",
     span: "tall",
   },
@@ -37,6 +39,7 @@ export const PROJECT_SLOTS: ProjectSlot[] = [
     meta: "HEALTHCARE — NEXT.JS",
     path: "/projects/marfil/index.html",
     image: "/media/marfil.png",
+    mobileImage: "/media/marfil-mobile.png",
     video: "/media/marfil.mov",
     span: "normal",
   },
@@ -48,6 +51,7 @@ export const PROJECT_SLOTS: ProjectSlot[] = [
     meta: "FOOD — NEXT.JS",
     path: "/projects/smashd/index.html",
     image: "/media/smashed.png",
+    mobileImage: "/media/smashed-mobile.png",
     video: "/media/smashed.mov",
     span: "normal",
   },
@@ -59,6 +63,7 @@ export const PROJECT_SLOTS: ProjectSlot[] = [
     meta: "CAFÉ — HTML / GSAP",
     path: "/projects/pausa/index.html",
     image: "/media/pausa.png",
+    mobileImage: "/media/pausa-mobile.png",
     video: "/media/pausa.mov",
     span: "wide",
   },
@@ -70,6 +75,7 @@ export const PROJECT_SLOTS: ProjectSlot[] = [
     meta: "DINING — HTML / CSS",
     path: "/projects/bistro/index.html",
     image: "/media/bristo.png",
+    mobileImage: "/media/bristo-mobile.png",
     video: "/media/bristo.mov",
     span: "normal",
   },
@@ -81,6 +87,7 @@ export const PROJECT_SLOTS: ProjectSlot[] = [
     meta: "FOOD — NEXT.JS",
     path: "/projects/pizzaman/index.html",
     image: "/media/pizzaman.png",
+    mobileImage: "/media/pizzaman-mobile.png",
     video: "/media/pizzaman.mov",
     span: "normal",
   },

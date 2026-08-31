@@ -112,6 +112,12 @@ function embedNextProject({ id, dir }) {
       '$1\n  output: "export",'
     );
   }
+  if (!/images:\s*\{[^}]*unoptimized:\s*true/.test(patched)) {
+    patched = patched.replace(
+      /(NextConfig\s*=\s*\{)/,
+      '$1\n  images: { unoptimized: true },'
+    );
+  }
   patched = patched.replace(
     /(NextConfig\s*=\s*\{)/,
     `$1\n  basePath: "/projects/${id}",`

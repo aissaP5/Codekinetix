@@ -93,8 +93,7 @@
       overflow: hidden;
     }
 
-    .preloader-bar::after {
-      content: '';
+    .preloader-bar-fill {
       position: absolute;
       inset: 0;
       background: var(--accent);
@@ -663,7 +662,9 @@
             class="char">a</span></span><span class="char-wrap"><span class="char">u</span></span><span
           class="char-wrap"><span class="char">s</span></span><span class="char-wrap"><span class="char">a</span></span>
       </h1>
-      <div class="preloader-bar"></div>
+      <div class="preloader-bar">
+        <div class="preloader-bar-fill"></div>
+      </div>
     </div>
   </div>
 
@@ -1265,18 +1266,32 @@
     const preloaderChars = document.querySelectorAll('#preloader-title .char');
     gsap.set(preloaderChars, { yPercent: 110 });
 
-    const preloaderTl = gsap.timeline();
+    let preloaderDismissed = false;
+    function dismissPreloader() {
+      if (preloaderDismissed) return;
+      preloaderDismissed = true;
+      document.body.classList.remove('loading');
+      const pl = document.getElementById('preloader');
+      if (pl) pl.style.display = 'none';
+      initHeroAnimations();
+      ScrollTrigger.refresh();
+    }
+
+    // Failsafe timer so preloader never gets stuck under any circumstances
+    const preloaderFailsafe = setTimeout(dismissPreloader, 3500);
+
+    const preloaderTl = gsap.timeline({
+      onComplete: () => {
+        clearTimeout(preloaderFailsafe);
+        dismissPreloader();
+      }
+    });
+
     preloaderTl.to(preloaderChars, {
       yPercent: 0, duration: 1, stagger: 0.07, ease: 'expo.out', delay: 0.2
-    }).to('.preloader-bar::after', { scaleX: 1, duration: 1, ease: 'power2.inOut' }, '-=0.8')
+    }).to('.preloader-bar-fill', { scaleX: 1, duration: 1, ease: 'power2.inOut' }, '-=0.8')
       .to('#preloader', {
-        yPercent: -100, duration: 1.1, ease: 'expo.inOut', delay: 0.4,
-        onComplete: () => {
-          document.body.classList.remove('loading');
-          document.getElementById('preloader').style.display = 'none';
-          initHeroAnimations();
-          ScrollTrigger.refresh();
-        }
+        yPercent: -100, duration: 1.1, ease: 'expo.inOut', delay: 0.4
       }, '-=0.2');
 
     // ====== Hero ======

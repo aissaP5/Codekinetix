@@ -13,6 +13,7 @@ import { getSlot } from "@/lib/projects";
 export default function ProjectShell() {
   const rootRef = useRef<HTMLDivElement>(null);
   const activeProject = useKinetix((s) => s.activeProject);
+  const phase = useKinetix((s) => s.phase);
   const exitProject = useKinetix((s) => s.exitProject);
   const [loaded, setLoaded] = useState(false);
 
@@ -89,16 +90,18 @@ export default function ProjectShell() {
 
       {/* the project itself — embedded build */}
       <div className="ps-frame relative flex-1 min-h-0 bg-bone">
-        <iframe
-          src={slot.path}
-          title={`${slot.name} — embedded project`}
-          className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-700 ${
-            loaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setLoaded(true)}
-          allow="clipboard-write"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
-        />
+        {phase === "project" && (
+          <iframe
+            src={slot.path}
+            title={`${slot.name} — embedded project`}
+            className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-700 ${
+              loaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setLoaded(true)}
+            allow="clipboard-write"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"
+          />
+        )}
 
         {/* loading plate — covers the iframe until its first paint */}
         {!loaded && (

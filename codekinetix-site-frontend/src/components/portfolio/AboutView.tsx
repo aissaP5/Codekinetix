@@ -300,12 +300,6 @@ export default function AboutView() {
                 <span className="absolute top-0 left-0 w-full h-4 bg-volt animate-drip" />
               </span>
             </div>
-
-            <p className="av-reveal hidden sm:block font-mono text-[10px] tracking-[0.25em] text-bone/50 text-right leading-relaxed">
-              ONE DEVELOPER
-              <br />
-              AGENCY MINDSET
-            </p>
           </div>
         </div>
       </section>

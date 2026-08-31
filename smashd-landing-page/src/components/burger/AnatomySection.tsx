@@ -81,29 +81,48 @@ export function AnatomySection() {
       renderFrame(current);
     };
 
-    /* progressive preload */
+    /* progressive preload — load first frame immediately, defer remaining frames to avoid entry lag */
     const preload = () => {
-      for (let i = 0; i < FRAME_COUNT; i++) {
-        const img = new Image();
-        img.decoding = "async";
-        img.src = FRAME_PATH(i);
-        images[i] = img;
-        const done = () => {
-          loaded++;
-          if (loaded === 1) {
-            // first frame visible -> hide loader
-            if (loaderRef.current) {
-              loaderRef.current.style.opacity = "0";
-              window.setTimeout(() => {
-                if (loaderRef.current) loaderRef.current.style.display = "none";
-              }, 500);
-            }
-            renderFrame(current);
+      const firstImg = new Image();
+      firstImg.decoding = "async";
+      firstImg.src = FRAME_PATH(0);
+      images[0] = firstImg;
+      firstImg.onload = () => {
+        loaded++;
+        if (loaderRef.current) {
+          loaderRef.current.style.opacity = "0";
+          window.setTimeout(() => {
+            if (loaderRef.current) loaderRef.current.style.display = "none";
+          }, 500);
+        }
+        renderFrame(current);
+      };
+
+      const loadRest = () => {
+        let i = 1;
+        const batch = () => {
+          const limit = Math.min(i + 8, FRAME_COUNT);
+          for (; i < limit; i++) {
+            const img = new Image();
+            img.decoding = "async";
+            img.src = FRAME_PATH(i);
+            images[i] = img;
+          }
+          if (i < FRAME_COUNT) {
+            setTimeout(batch, 60);
           }
         };
-        img.onload = done;
-        img.onerror = done;
-      }
+        batch();
+      };
+
+      const onStart = () => {
+        window.removeEventListener("scroll", onStart);
+        window.removeEventListener("pointerdown", onStart);
+        loadRest();
+      };
+      window.addEventListener("scroll", onStart, { passive: true, once: true });
+      window.addEventListener("pointerdown", onStart, { passive: true, once: true });
+      setTimeout(loadRest, 2000);
     };
 
     /* ---------------- scrub state ---------------- */

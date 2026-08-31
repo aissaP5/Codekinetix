@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CodeKinetix® — Freelance Web Studio",
     description:
-      "Websites, e-commerce and web applications — design, code and motion. One developer, agency mindset.",
+      "Websites, e-commerce and web applications — design, code and motion.",
     images: ["/og.png"],
   },
   robots: {

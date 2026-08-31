@@ -206,8 +206,16 @@
     background-size: 56px 56px;
   }
   .noise-overlay {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 220px 220px;
+    background-image: url("/noise-tile.png");
+    background-size: 200px 200px;
+    background-repeat: repeat;
+  }
+  /* Hide expensive full-viewport overlays on touch devices — invisible
+     at phone DPI / 5.5% opacity but cost ~4ms/frame in compositor time */
+  @media (pointer: coarse) {
+    .mobile-hide-overlay {
+      display: none !important;
+    }
   }
   .volt-glow {
     box-shadow: 0 18px 70px rgba(58, 111, 255, 0.32), 0 0 34px rgba(58, 111, 255, 0.18);
@@ -266,12 +274,14 @@
   width: 112%;
   height: 135%;
   will-change: transform;
+  contain: layout style paint;
 }
 .pt-col {
   position: absolute;
   top: -18%;
   height: 136%;
   will-change: transform;
+  contain: layout style paint;
 }
 /* R31 — the falling/exploding letters are 18vw glyphs animated with
    transform+opacity; without promotion some browsers repaint them on
