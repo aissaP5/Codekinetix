@@ -5,25 +5,44 @@ import { gsap } from "@/lib/gsap";
 import { useKinetix, type TabId } from "@/lib/store";
 import { curtain } from "@/lib/curtain";
 
-/**
- * Section transition — the column wave + falling letters.
- *
- * 1. An volt panel rises with a skew wobble, then seven void columns
- *    cascade up over it — the volt flashes through the gaps as they stack.
- * 2. While fully covered, the view swaps underneath.
- * 3. The destination word's letters FALL in — bounce + rotation.
- * 4. Letters EXPLODE outward in random directions, then the columns
- *    cascade down (reversed stagger) revealing the new section.
- */
-const WORD: Record<TabId, string> = {
-  about: "ABOUT",
-  works: "WORKS",
-  career: "CAREER",
-};
-const INDEX: Record<TabId, string> = {
-  about: "01",
-  works: "02",
-  career: "03",
+interface TabMeta {
+  word: string;
+  tag: string;
+  sub: string;
+  accent: string;
+}
+
+const TAB_CONFIG: Record<TabId, TabMeta> = {
+  studio: {
+    word: "STUDIO",
+    tag: "01 // MASTER HUB",
+    sub: "DIGITAL EXPERIENCE FLAGSHIP",
+    accent: "#c6ff00",
+  },
+  works: {
+    word: "WORKS",
+    tag: "02 // PORTFOLIO",
+    sub: "SELECTED CASE ARCHIVE",
+    accent: "#f2f1ea",
+  },
+  about: {
+    word: "ABOUT",
+    tag: "03 // IDENTITY",
+    sub: "CREATIVE ENGINEERING DNA",
+    accent: "#c6ff00",
+  },
+  lab: {
+    word: "LAB",
+    tag: "04 // RESEARCH",
+    sub: "BESPOKE INTERACTION SANDBOX",
+    accent: "#3a6fff",
+  },
+  contact: {
+    word: "CONTACT",
+    tag: "05 // TRANSMISSION",
+    sub: "COMMISSION A PROJECT",
+    accent: "#ff4d00",
+  },
 };
 
 const COLS = 7;
@@ -34,22 +53,19 @@ export default function PageTransition() {
   const contentTab = useKinetix((s) => s.contentTab);
   const setContentTab = useKinetix((s) => s.setContentTab);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  // R31 — curtain balance: a timeline killed mid-flight never reaches
-  // its onComplete, so its cover() must be rebalanced here before the
-  // fresh one covers again (rapid tab clicks).
   const coveredRef = useRef(false);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root || activeTab === contentTab) return;
 
-    // if a previous transition is mid-flight (rapid tab clicks) —
-    // kill it, hard-reset everything below the fold, play fresh
+    // Cancel any previous in-flight transition
     if (coveredRef.current) {
       curtain.uncover();
       coveredRef.current = false;
     }
     tlRef.current?.kill();
+
     const panel = root.querySelector<HTMLElement>(".pt-panel");
     const cols = gsap.utils.toArray<HTMLElement>(".pt-col", root);
     const letters = gsap.utils.toArray<HTMLElement>(".pt-letter", root);
@@ -62,13 +78,10 @@ export default function PageTransition() {
       xPercent: 0,
       yPercent: -170,
       opacity: 0,
-      rotation: () => gsap.utils.random(-30, 30),
+      rotation: () => gsap.utils.random(-25, 25),
     });
     gsap.set(meta, { opacity: 0 });
 
-    // R31 — announce the cover: the view mounting at 0.8s (and anything
-    // else alive underneath) stops painting while the screen is hidden
-    // and resumes as the columns lift. Uncovered on completion above.
     curtain.cover();
     coveredRef.current = true;
 
@@ -85,56 +98,54 @@ export default function PageTransition() {
     tlRef.current = tl;
 
     tl
-      // 1 — volt panel floods up with a wobble
-      .to(panel, { yPercent: 0, duration: 0.45 }, 0)
-      .to(panel, { skewY: -3, duration: 0.16, ease: "sine.inOut" }, 0.05)
-      .to(panel, { skewY: 0, duration: 0.2, ease: "sine.inOut" }, 0.3)
-      // 2 — void columns cascade over it (volt flashes between them)
-      .to(cols, { yPercent: 0, duration: 0.5, stagger: 0.05 }, 0.18)
-      .to(cols, { skewY: -3, duration: 0.14, ease: "sine.inOut", stagger: 0.05 }, 0.24)
-      .to(cols, { skewY: 0, duration: 0.18, ease: "sine.inOut", stagger: 0.05 }, 0.5)
-      // 3 — swap the view while covered
-      .call(() => setContentTab(activeTab), [], 0.8)
-      // 4 — destination letters FALL onto the void
+      // 1 — Backdrop rises with a fluid skew
+      .to(panel, { yPercent: 0, duration: 0.4 }, 0)
+      .to(panel, { skewY: -2, duration: 0.14, ease: "sine.inOut" }, 0.05)
+      .to(panel, { skewY: 0, duration: 0.18, ease: "sine.inOut" }, 0.25)
+      // 2 — Columns cascade over backdrop
+      .to(cols, { yPercent: 0, duration: 0.45, stagger: 0.04 }, 0.14)
+      .to(cols, { skewY: -2, duration: 0.12, ease: "sine.inOut", stagger: 0.04 }, 0.2)
+      .to(cols, { skewY: 0, duration: 0.16, ease: "sine.inOut", stagger: 0.04 }, 0.42)
+      // 3 — Swap content underneath while completely covered
+      .call(() => setContentTab(activeTab), [], 0.65)
+      // 4 — Destination letters fall in with elastic bounce
       .to(
         letters,
         {
           yPercent: 0,
           opacity: 1,
           rotation: 0,
-          duration: 0.55,
-          stagger: 0.045,
-          ease: "back.out(1.9)",
+          duration: 0.45,
+          stagger: 0.035,
+          ease: "back.out(1.8)",
         },
-        0.84
+        0.68
       )
-      .to(meta, { opacity: 1, duration: 0.3, ease: "none" }, 1.05)
-      // 5 — letters EXPLODE outward, everything cascades down
+      .to(meta, { opacity: 1, duration: 0.25, ease: "none" }, 0.85)
+      // 5 — Explosive scatter reveal
       .to(
         letters,
         {
-          xPercent: () => gsap.utils.random(-140, 140),
-          yPercent: () => gsap.utils.random(-220, 220),
-          rotation: () => gsap.utils.random(-100, 100),
+          xPercent: () => gsap.utils.random(-120, 120),
+          yPercent: () => gsap.utils.random(-180, 180),
+          rotation: () => gsap.utils.random(-80, 80),
           opacity: 0,
-          duration: 0.42,
-          stagger: 0.02,
+          duration: 0.35,
+          stagger: 0.015,
           ease: "power2.in",
         },
-        1.62
+        1.3
       )
-      .to(meta, { opacity: 0, duration: 0.2, ease: "none" }, 1.62)
-      .to(panel, { yPercent: -104, duration: 0.5 }, 1.72)
+      .to(meta, { opacity: 0, duration: 0.18, ease: "none" }, 1.3)
+      .to(panel, { yPercent: -104, duration: 0.42 }, 1.4)
       .to(
         cols,
-        { yPercent: -104, duration: 0.55, stagger: { each: 0.05, from: "end" } },
-        1.8
+        { yPercent: -104, duration: 0.48, stagger: { each: 0.04, from: "end" } },
+        1.45
       );
-    // NOTE: intentionally no cleanup kill — the timeline must survive the
-    // contentTab state flip it triggers at 0.8s.
   }, [activeTab, contentTab, setContentTab]);
 
-  const word = WORD[activeTab];
+  const currentMeta = TAB_CONFIG[activeTab] || TAB_CONFIG.studio;
 
   return (
     <div
@@ -143,35 +154,35 @@ export default function PageTransition() {
       style={{ visibility: "hidden" }}
       aria-hidden="true"
     >
-      {/* back layer — volt flood */}
+      {/* Background flood */}
       <div className="pt-panel bg-volt" />
 
-      {/* front layer — seven void columns */}
+      {/* Seven void columns */}
       {Array.from({ length: COLS }).map((_, i) => (
         <div
           key={i}
           className="pt-col bg-void"
-          style={{ left: `${(i * 100) / COLS}%`, width: `${100 / COLS + 0.25}%` }}
+          style={{ left: `${(i * 100) / COLS}%`, width: `${100 / COLS + 0.3}%` }}
         />
       ))}
 
-      {/* falling letters */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="pt-meta font-mono text-[10px] sm:text-[11px] tracking-[0.45em] text-volt mb-4">
-          ENTERING
+      {/* Kinetic Destination Typography */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+        <p className="pt-meta font-mono text-[10px] sm:text-xs tracking-[0.4em] text-volt uppercase mb-4 font-bold">
+          {currentMeta.tag}
         </p>
-        <h2 className="flex justify-center leading-[0.95]">
-          {word.split("").map((ch, i) => (
+        <h2 className="flex justify-center leading-[0.9] select-none">
+          {currentMeta.word.split("").map((ch, i) => (
             <span
-              key={`${word}-${i}`}
-              className="pt-letter inline-block font-extrabold type-xwide text-volt text-[18vw] sm:text-[14vw]"
+              key={`${currentMeta.word}-${i}`}
+              className="pt-letter inline-block font-extrabold type-xwide text-volt text-[20vw] sm:text-[15vw]"
             >
               {ch}
             </span>
           ))}
         </h2>
-        <p className="pt-meta font-mono text-[10px] tracking-[0.3em] text-bone/40 mt-6">
-          {INDEX[activeTab]} / 03
+        <p className="pt-meta font-mono text-[10px] tracking-[0.25em] text-bone/45 mt-6 uppercase">
+          {currentMeta.sub}
         </p>
       </div>
     </div>

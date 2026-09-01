@@ -1,18 +1,29 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { gsap } from "@/lib/gsap";
-import { useKinetix } from "@/lib/store";
 
-/**
- * Minimal studio header — wordmark, one-line positioning, contact action.
- * No clock, no location, no branch indicators. The CTA is magnetic on
- * pointer devices: it drifts toward the cursor and snaps home on leave.
- */
+const NAV_LINKS = [
+  { href: "/works", label: "WORKS" },
+  { href: "/about", label: "ABOUT" },
+  { href: "/lab", label: "LAB" },
+  { href: "/career", label: "CAREER" },
+];
+
 export default function TopBar() {
   const ctaRef = useRef<HTMLAnchorElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Magnetic button on desktop pointer
   useEffect(() => {
     const btn = ctaRef.current;
     if (!btn) return;
@@ -23,7 +34,7 @@ export default function TopBar() {
     const yTo = gsap.quickTo(btn, "y", { duration: 0.35, ease: "power3" });
 
     const onEnter = () => {
-      base = btn.getBoundingClientRect(); // unmoved rect — no feedback loop
+      base = btn.getBoundingClientRect();
     };
     const onMove = (e: PointerEvent) => {
       if (!base) return;
@@ -46,37 +57,181 @@ export default function TopBar() {
     };
   }, []);
 
+  // Mobile Menu Animation
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+      gsap.set(menu, { display: "flex" });
+      gsap.fromTo(
+        menu,
+        { clipPath: "inset(0 0 100% 0)" },
+        { clipPath: "inset(0 0 0% 0)", duration: 0.55, ease: "power4.inOut" }
+      );
+      gsap.fromTo(
+        ".mob-link",
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, delay: 0.25, ease: "power3.out" }
+      );
+    } else {
+      document.body.style.overflow = "";
+      gsap.to(menu, {
+        clipPath: "inset(0 0 100% 0)",
+        duration: 0.45,
+        ease: "power4.inOut",
+        onComplete: () => {
+          gsap.set(menu, { display: "none" });
+        },
+      });
+    }
+  }, [menuOpen]);
+
   return (
-    <header className="relative z-40 flex items-center justify-between gap-3 px-4 sm:px-8 py-3.5 sm:py-4 border-b border-bone/10 bg-void">
-      {/* wordmark */}
-      <Link
-        href="/about"
-        className="flex items-center gap-2.5 shrink-0"
-        aria-label="CodeKinetix home"
-      >
-        <span className="w-2.5 h-2.5 bg-volt rotate-45 shrink-0" aria-hidden="true" />
-        <span className="font-extrabold type-wide uppercase tracking-tight text-bone text-[15px] sm:text-[17px] leading-none">
-          CodeKinetix<sup className="text-volt text-[9px] align-super">®</sup>
-        </span>
-      </Link>
+    <>
+      <header className="relative z-40 flex items-center justify-between gap-3 px-4 sm:px-8 py-3.5 sm:py-4 border-b border-bone/10 bg-void">
+        {/* Wordmark */}
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 shrink-0 group focus:outline-none"
+          aria-label="CodeKinetix home"
+        >
+          <span className="w-2.5 h-2.5 bg-volt rotate-45 shrink-0 group-hover:scale-125 transition-transform" aria-hidden="true" />
+          <span className="font-extrabold type-wide uppercase tracking-tight text-bone text-[15px] sm:text-[17px] leading-none">
+            CodeKinetix<sup className="text-volt text-[9px] align-super">®</sup>
+          </span>
+        </Link>
 
-      {/* one-line positioning */}
-      <p className="hidden lg:block font-mono text-[10px] tracking-[0.22em] text-ash text-center">
-        INDEPENDENT WEB STUDIO — SITES · SHOPS · WEB APPS
-      </p>
+        {/* Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-8 font-mono text-[11px] tracking-[0.2em]" aria-label="Main Navigation">
+          {NAV_LINKS.map((link) => {
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : link.href.startsWith("/#")
+                ? false
+                : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`transition-colors uppercase ${
+                  isActive
+                    ? "text-volt font-bold"
+                    : "text-bone/70 hover:text-volt"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
 
-      {/* contact action — magnetic button opening direct email */}
-      <a
-        ref={ctaRef}
-        href="mailto:codekinetixstudio@gmail.com"
-        className="group flex items-center gap-2 bg-volt text-void font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.15em] px-4 sm:px-5 py-2.5 hover:bg-bone transition-colors duration-300 [-webkit-tap-highlight-color:transparent]"
-        aria-label="Send an email to CodeKinetix"
+        {/* Action Group */}
+        <div className="flex items-center gap-3">
+          {/* Primary Magnetic CTA */}
+          <Link
+            ref={ctaRef}
+            href="/contact"
+            className="group flex items-center gap-2 bg-volt text-void font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.15em] px-4 sm:px-5 py-2.5 hover:bg-bone transition-colors duration-300 [-webkit-tap-highlight-color:transparent]"
+            aria-label="Start a Project with CodeKinetix"
+          >
+            START A PROJECT
+            <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300">
+              ↗
+            </span>
+          </Link>
+
+          {/* Hamburger Mobile Toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="lg:hidden p-2 text-bone hover:text-volt transition-colors focus:outline-none"
+            aria-label="Toggle navigation menu"
+            aria-expanded={menuOpen}
+          >
+            <div className="w-5 flex flex-col items-end gap-1.5">
+              <span
+                className={`h-0.5 bg-current transition-all duration-300 ${
+                  menuOpen ? "w-5 rotate-45 translate-y-2 bg-volt" : "w-5"
+                }`}
+              />
+              <span
+                className={`h-0.5 bg-current transition-all duration-300 ${
+                  menuOpen ? "opacity-0" : "w-3"
+                }`}
+              />
+              <span
+                className={`h-0.5 bg-current transition-all duration-300 ${
+                  menuOpen ? "w-5 -rotate-45 -translate-y-2 bg-volt" : "w-4"
+                }`}
+              />
+            </div>
+          </button>
+        </div>
+      </header>
+
+      {/* Full-Screen Animated Mobile Menu */}
+      <div
+        ref={menuRef}
+        className="fixed inset-0 z-50 bg-void flex-col justify-between p-6 sm:p-12 overflow-y-auto"
+        style={{ display: "none", clipPath: "inset(0 0 100% 0)" }}
       >
-        LET&apos;S TALK
-        <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300">
-          ↗
-        </span>
-      </a>
-    </header>
+        <div className="flex items-center justify-between border-b border-bone/10 pb-6">
+          <Link
+            href="/"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2.5"
+          >
+            <span className="w-2.5 h-2.5 bg-volt rotate-45" />
+            <span className="font-extrabold type-wide uppercase tracking-tight text-bone text-lg">
+              CodeKinetix<sup className="text-volt text-[9px] align-super">®</sup>
+            </span>
+          </Link>
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="font-mono text-xs text-bone/60 hover:text-volt tracking-widest uppercase p-2"
+          >
+            CLOSE [×]
+          </button>
+        </div>
+
+        <nav className="my-auto py-8 flex flex-col gap-4">
+          <p className="font-mono text-[10px] tracking-[0.3em] text-ash uppercase mb-2">
+            NAVIGATION //
+          </p>
+          <Link
+            href="/"
+            onClick={() => setMenuOpen(false)}
+            className="mob-link font-extrabold type-xwide uppercase text-4xl sm:text-5xl text-bone hover:text-volt transition-colors"
+          >
+            STUDIO
+          </Link>
+          {NAV_LINKS.map((link, idx) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className="mob-link font-extrabold type-xwide uppercase text-4xl sm:text-5xl text-bone hover:text-volt transition-colors flex items-center justify-between"
+            >
+              <span>{link.label}</span>
+              <span className="font-mono text-xs text-ash tracking-normal">0{idx + 1}</span>
+            </Link>
+          ))}
+          <Link
+            href="/contact"
+            onClick={() => setMenuOpen(false)}
+            className="mob-link font-extrabold type-xwide uppercase text-4xl sm:text-5xl text-volt hover:text-bone transition-colors"
+          >
+            START A PROJECT ↗
+          </Link>
+        </nav>
+
+        <div className="pt-6 border-t border-bone/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-[10px] text-ash">
+          <span>INDEPENDENT DIGITAL EXPERIENCE STUDIO</span>
+          <span>AVAILABLE FOR PROJECTS — 2026</span>
+        </div>
+      </div>
+    </>
   );
 }

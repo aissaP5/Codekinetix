@@ -4,19 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useKinetix, type TabId } from "@/lib/store";
 import Preloader from "@/components/portfolio/Preloader";
-import TopBar from "@/components/portfolio/TopBar";
 import BottomNav from "@/components/portfolio/BottomNav";
-import Marquee from "@/components/portfolio/Marquee";
 import Footer from "@/components/portfolio/Footer";
 import ScrollProgress from "@/components/portfolio/ScrollProgress";
 import ProjectShell from "@/components/project/ProjectShell";
 import ProjectTransition from "@/components/project/ProjectTransition";
 import PageTransition from "@/components/portfolio/PageTransition";
+import CustomCursor from "@/components/portfolio/CustomCursor";
 
 function getTabFromPath(path: string): TabId {
+  if (path === "/") return "studio";
   if (path.startsWith("/works")) return "works";
-  if (path.startsWith("/career")) return "career";
-  return "about";
+  if (path.startsWith("/about")) return "about";
+  if (path.startsWith("/lab")) return "lab";
+  if (path.startsWith("/contact")) return "contact";
+  return "studio";
 }
 
 function RouteTransitionContainer({
@@ -43,10 +45,8 @@ function RouteTransitionContainer({
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      if (activeTab !== targetTab) {
-        setActiveTab(targetTab);
-        setContentTab(targetTab);
-      }
+      setActiveTab(targetTab);
+      setContentTab(targetTab);
       setDisplayedChildren(children);
       prevPathnameRef.current = pathname;
       return;
@@ -60,7 +60,7 @@ function RouteTransitionContainer({
     }
   }, [pathname, targetTab, activeTab, setActiveTab, setContentTab, children]);
 
-  // When contentTab flips to targetTab (at t=0.8s in PageTransition under the cover),
+  // When contentTab flips to targetTab under the cover,
   // update the displayed children and reset the scroll position
   useEffect(() => {
     if (contentTab === targetTab) {
@@ -88,7 +88,8 @@ export default function PortfolioShell({
   const phase = useKinetix((s) => s.phase);
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden bg-void text-bone">
+    <div className="h-dvh flex flex-col overflow-hidden bg-void text-bone relative">
+      <CustomCursor />
       <Preloader />
 
       {/* technical grid — the skeleton under everything */}
@@ -109,13 +110,11 @@ export default function PortfolioShell({
         }`}
         aria-hidden={phase === "project"}
       >
-        <TopBar />
         <main
           ref={scrollRef}
           className="relative z-10 flex-1 min-h-0 overflow-y-auto ck-scroll"
         >
           <ScrollProgress />
-          <Marquee />
           <RouteTransitionContainer scrollRef={scrollRef}>
             {children}
           </RouteTransitionContainer>
@@ -128,7 +127,7 @@ export default function PortfolioShell({
       <ProjectShell />
       <ProjectTransition />
 
-      {/* section transitions — column wave + falling letters */}
+      {/* section transitions — page-specific motion */}
       <PageTransition />
     </div>
   );

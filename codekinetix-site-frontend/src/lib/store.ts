@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type TabId = "about" | "works" | "career";
+export type TabId = "studio" | "works" | "about" | "lab" | "contact";
 
 export type Phase =
   | "booting" // preloader visible
@@ -29,12 +29,12 @@ interface KinetixState {
 export const useKinetix = create<KinetixState>((set) => ({
   phase: "booting",
   activeProject: null,
-  activeTab: "about",
-  contentTab: "about",
+  activeTab: "studio",
+  contentTab: "studio",
   contactOpen: false,
 
   booted: (tab) =>
-    set({ phase: "site", activeTab: tab ?? "about", contentTab: tab ?? "about" }),
+    set({ phase: "site", activeTab: tab ?? "studio", contentTab: tab ?? "studio" }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setContentTab: (tab) => set({ contentTab: tab }),
   openProject: (id) => set({ phase: "opening", activeProject: id }),
