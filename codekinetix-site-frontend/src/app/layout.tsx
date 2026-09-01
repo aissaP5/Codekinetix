@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Instrument_Serif, Fragment_Mono } from "next/font/google";
+import PortfolioShell from "@/components/portfolio/PortfolioShell";
 import "./globals.css";
 // R33 — the shadcn <Toaster /> was removed from here: nothing on the
 // site ever raises a toast (zero useToast callers), but it dragged
@@ -157,7 +158,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {children}
+        <PortfolioShell>{children}</PortfolioShell>
       </body>
     </html>
   );

@@ -6,10 +6,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://codekinetix.dev";
   return [
     {
-      url: base,
+      url: `${base}/about`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
+    },
+    {
+      url: `${base}/works`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}/career`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
   ];
 }

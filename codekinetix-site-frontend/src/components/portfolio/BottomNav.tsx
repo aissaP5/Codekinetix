@@ -3,16 +3,16 @@
 import { useKinetix, type TabId } from "@/lib/store";
 import { gsap } from "@/lib/gsap";
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "about", label: "ABOUT" },
-  { id: "works", label: "WORKS" },
-  { id: "career", label: "CAREER" },
+const TABS: { id: TabId; label: string; href: string }[] = [
+  { id: "about", label: "ABOUT", href: "/about" },
+  { id: "works", label: "WORKS", href: "/works" },
+  { id: "career", label: "CAREER", href: "/career" },
 ];
 
 export default function BottomNav() {
   const activeTab = useKinetix((s) => s.activeTab);
-  const setActiveTab = useKinetix((s) => s.setActiveTab);
   const pillRef = useRef<HTMLDivElement>(null);
 
   // animated active pill. On mobile the mono font lands AFTER first paint,
@@ -55,19 +55,19 @@ export default function BottomNav() {
             aria-hidden="true"
           />
           {TABS.map((t) => (
-            <button
+            <Link
               key={t.id}
+              href={t.href}
               data-tab={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`relative z-10 h-[38px] px-5 sm:px-8 rounded-full font-mono text-[11px] tracking-[0.18em] select-none [-webkit-tap-highlight-color:transparent] [touch-action:manipulation] transition-colors duration-300 ${
+              className={`relative z-10 flex items-center justify-center h-[38px] px-5 sm:px-8 rounded-full font-mono text-[11px] tracking-[0.18em] select-none [-webkit-tap-highlight-color:transparent] [touch-action:manipulation] transition-colors duration-300 ${
                 activeTab === t.id
                   ? "text-void font-bold"
                   : "text-bone/55 [@media(hover:hover)]:hover:text-bone"
               }`}
-              aria-pressed={activeTab === t.id}
+              aria-current={activeTab === t.id ? "page" : undefined}
             >
               <span>{t.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>

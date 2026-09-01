@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { gsap } from "@/lib/gsap";
 import { useKinetix } from "@/lib/store";
 
@@ -11,7 +12,6 @@ const SOCIALS = [
 
 export default function Footer() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const setActiveTab = useKinetix((s) => s.setActiveTab);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -120,18 +120,18 @@ export default function Footer() {
             <ul className="space-y-2 font-mono text-xs">
               {(
                 [
-                  ["about", "ABOUT"],
-                  ["works", "WORKS"],
-                  ["career", "CAREER"],
+                  ["about", "ABOUT", "/about"],
+                  ["works", "WORKS", "/works"],
+                  ["career", "CAREER", "/career"],
                 ] as const
-              ).map(([id, label]) => (
+              ).map(([id, label, href]) => (
                 <li key={id}>
-                  <button
-                    onClick={() => setActiveTab(id)}
+                  <Link
+                    href={href}
                     className="text-bone/70 hover:text-volt transition-colors"
                   >
                     {label}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>

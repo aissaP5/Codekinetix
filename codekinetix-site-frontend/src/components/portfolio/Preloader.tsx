@@ -265,7 +265,7 @@ export default function Preloader() {
             onStart: () => {
               curtain.uncover();
               coveredRef.current = false;
-              booted("about");
+              booted(useKinetix.getState().activeTab);
             },
           },
           T.liftPos

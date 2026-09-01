@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { gsap } from "@/lib/gsap";
 import { useKinetix } from "@/lib/store";
 
@@ -48,9 +49,8 @@ export default function TopBar() {
   return (
     <header className="relative z-40 flex items-center justify-between gap-3 px-4 sm:px-8 py-3.5 sm:py-4 border-b border-bone/10 bg-void">
       {/* wordmark */}
-      <a
-        href="#"
-        onClick={(e) => e.preventDefault()}
+      <Link
+        href="/about"
         className="flex items-center gap-2.5 shrink-0"
         aria-label="CodeKinetix home"
       >
@@ -58,7 +58,7 @@ export default function TopBar() {
         <span className="font-extrabold type-wide uppercase tracking-tight text-bone text-[15px] sm:text-[17px] leading-none">
           CodeKinetix<sup className="text-volt text-[9px] align-super">®</sup>
         </span>
-      </a>
+      </Link>
 
       {/* one-line positioning */}
       <p className="hidden lg:block font-mono text-[10px] tracking-[0.22em] text-ash text-center">
