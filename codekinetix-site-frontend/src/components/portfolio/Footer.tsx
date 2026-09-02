@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { gsap } from "@/lib/gsap";
+import { usePathname } from "next/navigation";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 const SOCIALS = [
   { label: "INSTAGRAM", href: "https://www.instagram.com/codekinetix/" },
@@ -19,6 +20,7 @@ const SECTIONS = [
 
 export default function Footer() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const root = rootRef.current;
@@ -33,8 +35,9 @@ export default function Footer() {
         scrollTrigger: {
           trigger: root,
           scroller: scrollerEl,
-          start: "top 88%",
+          start: "top 92%",
           once: true,
+          invalidateOnRefresh: true,
         },
       });
       tl.to(".ft-reveal", { opacity: 1, y: 0, duration: 0.6, stagger: 0.07, ease: "power3.out" }).to(
@@ -56,19 +59,28 @@ export default function Footer() {
             start: "top bottom",
             end: "bottom bottom",
             scrub: 0.6,
+            invalidateOnRefresh: true,
           },
         }
       );
     }, root);
 
-    return () => ctx.revert();
-  }, []);
+    // Refresh triggers once layout stabilizes
+    const t = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    return () => {
+      clearTimeout(t);
+      ctx.revert();
+    };
+  }, [pathname]);
 
   return (
     <footer
       id="contact"
       ref={rootRef}
-      className="relative bg-void text-bone [content-visibility:auto] [contain-intrinsic-size:auto_600px] border-t border-bone/10"
+      className="relative bg-void text-bone border-t border-bone/10"
     >
       {/* Volt crown bar */}
       <div className="h-[3px] w-full bg-volt" aria-hidden="true" />

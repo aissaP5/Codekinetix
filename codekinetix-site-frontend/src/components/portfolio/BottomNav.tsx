@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "@/lib/gsap";
+import { useKinetix, type TabId } from "@/lib/store";
 
 const TABS = [
   { id: "studio", label: "STUDIO", href: "/" },
@@ -16,6 +17,7 @@ const TABS = [
 export default function BottomNav() {
   const pathname = usePathname();
   const pillRef = useRef<HTMLDivElement>(null);
+  const setActiveTab = useKinetix((s) => s.setActiveTab);
 
   // Determine active tab from pathname
   const activeTabId =
@@ -54,6 +56,12 @@ export default function BottomNav() {
     return () => ro.disconnect();
   }, [activeTabId]);
 
+  const handleTabClick = (tabId: string) => {
+    if (activeTabId !== tabId) {
+      setActiveTab(tabId as TabId);
+    }
+  };
+
   return (
     <nav
       className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-auto max-w-[95vw]"
@@ -76,6 +84,7 @@ export default function BottomNav() {
                 key={t.id}
                 href={t.href}
                 data-tab={t.id}
+                onClick={() => handleTabClick(t.id)}
                 className={`relative z-10 flex items-center justify-center h-[36px] px-3.5 sm:px-6 rounded-full font-mono text-[10px] sm:text-[11px] tracking-[0.16em] select-none [-webkit-tap-highlight-color:transparent] transition-colors duration-300 ${
                   isCurrent
                     ? "text-void font-bold"

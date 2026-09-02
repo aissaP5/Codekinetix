@@ -4,8 +4,8 @@ import { useState } from "react";
 
 const FAQS = [
   {
-    q: "How much does a website cost?",
-    a: "Every project is priced transparently based on scope, custom design requirements, motion complexity, and features. Standard bespoke sites typically range from €1,500 to €5,000+, while complex web apps and large e-commerce platforms are scoped individually with fixed-price milestones.",
+    q: "How do you scope a project?",
+    a: "Every project begins with an in-depth discovery phase to analyze your brand goals, required features, motion choreography, and technical architecture. We provide a structured roadmap and milestone delivery schedule before development begins.",
   },
   {
     q: "How long does a project take?",

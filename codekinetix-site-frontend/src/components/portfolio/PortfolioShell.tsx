@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useKinetix, type TabId } from "@/lib/store";
+import { ScrollTrigger } from "@/lib/gsap";
 import Preloader from "@/components/portfolio/Preloader";
 import BottomNav from "@/components/portfolio/BottomNav";
 import Footer from "@/components/portfolio/Footer";
@@ -66,6 +67,9 @@ function RouteTransitionContainer({
     if (contentTab === targetTab) {
       setDisplayedChildren(children);
       scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 50);
     }
   }, [contentTab, targetTab, children, scrollRef]);
 

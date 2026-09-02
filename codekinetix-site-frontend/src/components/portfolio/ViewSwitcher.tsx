@@ -15,10 +15,9 @@ import AboutView from "./AboutView";
 const WorksView = dynamic(() => import("./WorksView"), { ssr: false });
 const CareerView = dynamic(() => import("./CareerView"), { ssr: false });
 
-const VIEWS: Record<TabId, React.ComponentType> = {
+const VIEWS: Partial<Record<TabId, React.ComponentType>> = {
   works: WorksView,
   about: AboutView,
-  career: CareerView,
 };
 
 /**
@@ -73,7 +72,7 @@ export default function ViewSwitcher({
     };
   }, []);
 
-  const View = VIEWS[contentTab];
+  const View = VIEWS[contentTab] || AboutView;
   return (
     <div>
       <View />

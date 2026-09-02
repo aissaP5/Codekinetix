@@ -150,9 +150,8 @@ export default function HomePage() {
       <section className="relative flex flex-col min-h-[90vh] px-4 sm:px-8 pt-8 pb-16 justify-between overflow-hidden">
         <div>
           <div className="hero-fade flex flex-wrap items-center justify-between gap-4 font-mono text-[10px] tracking-[0.3em] text-bone/50 mb-8 sm:mb-12">
-            <span className="flex items-center gap-2 text-volt font-bold">
-              <span className="w-2 h-2 rounded-full bg-volt animate-ping" />
-              ● AVAILABLE FOR PROJECTS
+            <span className="text-volt font-bold">
+              AVAILABLE FOR PROJECTS
             </span>
             <span className="hidden sm:inline">DIGITAL EXPERIENCE STUDIO</span>
             <span>DESIGN × CODE × MOTION</span>

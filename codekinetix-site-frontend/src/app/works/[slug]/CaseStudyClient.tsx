@@ -17,6 +17,15 @@ export default function CaseStudyClient({
   const openProject = useKinetix((s) => s.openProject);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("view") === "live") {
+        openProject(slot.id);
+      }
+    }
+  }, [slot.id, openProject]);
+
+  useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const scrollerEl = root.closest("main") ?? undefined;

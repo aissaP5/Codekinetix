@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getSlot } from "@/lib/projects";
 
 export type TabId = "studio" | "works" | "about" | "lab" | "contact";
 
@@ -37,9 +38,24 @@ export const useKinetix = create<KinetixState>((set) => ({
     set({ phase: "site", activeTab: tab ?? "studio", contentTab: tab ?? "studio" }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setContentTab: (tab) => set({ contentTab: tab }),
-  openProject: (id) => set({ phase: "opening", activeProject: id }),
+  openProject: (id) => {
+    if (typeof window !== "undefined") {
+      const slot = getSlot(id);
+      if (slot) {
+        window.history.pushState({ project: id }, "", `/works/${slot.slug}?view=live`);
+      }
+    }
+    set({ phase: "opening", activeProject: id });
+  },
   projectReady: () => set({ phase: "project" }),
-  exitProject: () => set({ phase: "opening", activeProject: null }),
+  exitProject: () => {
+    if (typeof window !== "undefined") {
+      if (window.location.search.includes("view=live") || window.location.pathname.startsWith("/works/")) {
+        window.history.pushState(null, "", "/works");
+      }
+    }
+    set({ phase: "opening", activeProject: null });
+  },
   siteReady: () => set({ phase: "site" }),
   openContact: () => set({ contactOpen: true }),
   closeContact: () => set({ contactOpen: false }),

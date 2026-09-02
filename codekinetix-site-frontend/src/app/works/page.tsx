@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gsap } from "@/lib/gsap";
 import { PROJECT_SLOTS, type ProjectSlot } from "@/lib/projects";
 import { useKinetix } from "@/lib/store";
+import { curtain } from "@/lib/curtain";
 import WorksDeck from "@/components/portfolio/WorksDeck";
 
 const CATEGORIES = ["ALL", "E-COMMERCE", "EXPERIENCE", "DINING & HOSPITALITY", "HEALTHCARE", "FOOD"];
@@ -62,7 +63,7 @@ function GridCard({
             muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
             className="absolute inset-0 w-full h-full object-cover object-top opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
           />
         )}
@@ -135,32 +136,49 @@ export default function WorksPage() {
       : PROJECT_SLOTS.filter((s) => s.category === selectedCat);
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const scrollerEl = root.closest("main") ?? undefined;
+    let ctx: gsap.Context | null = null;
+    let alive = true;
 
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>(".work-item-card").forEach((card) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: card,
-              scroller: scrollerEl,
-              start: "top 88%",
-              once: true,
-            },
-          }
-        );
+    const init = () => {
+      if (!alive) return;
+      const root = rootRef.current;
+      if (!root) return;
+      const scrollerEl = root.closest("main") ?? undefined;
+
+      ctx = gsap.context(() => {
+        gsap.utils.toArray<HTMLElement>(".work-item-card").forEach((card) => {
+          gsap.fromTo(
+            card,
+            { opacity: 0, y: 40 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                scroller: scrollerEl,
+                start: "top 88%",
+                once: true,
+              },
+            }
+          );
+        });
+      }, root);
+    };
+
+    if (curtain.isCovered()) {
+      curtain.whenUncovered().then(() => {
+        if (alive) init();
       });
-    }, root);
+    } else {
+      init();
+    }
 
-    return () => ctx.revert();
+    return () => {
+      alive = false;
+      ctx?.revert();
+    };
   }, [selectedCat, viewMode]);
 
   return (

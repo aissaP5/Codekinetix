@@ -24,14 +24,21 @@ export default function ProjectShell() {
     setLoaded(false);
   }, [activeProject]);
 
-  // Escape always steps back out to the works deck
+  // Escape or back button steps back out to the works deck
   useEffect(() => {
     if (!slot) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") exitProject();
     };
+    const onPopState = () => {
+      exitProject();
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("popstate", onPopState);
+    };
   }, [slot, exitProject]);
 
   useEffect(() => {

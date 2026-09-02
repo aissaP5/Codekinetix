@@ -98,16 +98,12 @@ export default function PageTransition() {
     tlRef.current = tl;
 
     tl
-      // 1 — Backdrop rises with a fluid skew
-      .to(panel, { yPercent: 0, duration: 0.4 }, 0)
-      .to(panel, { skewY: -2, duration: 0.14, ease: "sine.inOut" }, 0.05)
-      .to(panel, { skewY: 0, duration: 0.18, ease: "sine.inOut" }, 0.25)
-      // 2 — Columns cascade over backdrop
-      .to(cols, { yPercent: 0, duration: 0.45, stagger: 0.04 }, 0.14)
-      .to(cols, { skewY: -2, duration: 0.12, ease: "sine.inOut", stagger: 0.04 }, 0.2)
-      .to(cols, { skewY: 0, duration: 0.16, ease: "sine.inOut", stagger: 0.04 }, 0.42)
+      // 1 — Backdrop rises swiftly to establish instant full coverage
+      .to(panel, { yPercent: 0, duration: 0.28, ease: "power4.out" }, 0)
+      // 2 — Columns cascade over backdrop in parallel
+      .to(cols, { yPercent: 0, duration: 0.3, stagger: 0.015, ease: "power4.out" }, 0)
       // 3 — Swap content underneath while completely covered
-      .call(() => setContentTab(activeTab), [], 0.65)
+      .call(() => setContentTab(activeTab), [], 0.32)
       // 4 — Destination letters fall in with elastic bounce
       .to(
         letters,
@@ -115,14 +111,14 @@ export default function PageTransition() {
           yPercent: 0,
           opacity: 1,
           rotation: 0,
-          duration: 0.45,
-          stagger: 0.035,
+          duration: 0.36,
+          stagger: 0.025,
           ease: "back.out(1.8)",
         },
-        0.68
+        0.34
       )
-      .to(meta, { opacity: 1, duration: 0.25, ease: "none" }, 0.85)
-      // 5 — Explosive scatter reveal
+      .to(meta, { opacity: 1, duration: 0.2, ease: "none" }, 0.44)
+      // 5 — Explosive scatter reveal & uncover
       .to(
         letters,
         {
@@ -130,18 +126,18 @@ export default function PageTransition() {
           yPercent: () => gsap.utils.random(-180, 180),
           rotation: () => gsap.utils.random(-80, 80),
           opacity: 0,
-          duration: 0.35,
-          stagger: 0.015,
+          duration: 0.28,
+          stagger: 0.012,
           ease: "power2.in",
         },
-        1.3
+        0.82
       )
-      .to(meta, { opacity: 0, duration: 0.18, ease: "none" }, 1.3)
-      .to(panel, { yPercent: -104, duration: 0.42 }, 1.4)
+      .to(meta, { opacity: 0, duration: 0.15, ease: "none" }, 0.82)
+      .to(panel, { yPercent: -104, duration: 0.35, ease: "power3.inOut" }, 0.9)
       .to(
         cols,
-        { yPercent: -104, duration: 0.48, stagger: { each: 0.04, from: "end" } },
-        1.45
+        { yPercent: -104, duration: 0.38, stagger: { each: 0.025, from: "end" }, ease: "power3.inOut" },
+        0.92
       );
   }, [activeTab, contentTab, setContentTab]);
 

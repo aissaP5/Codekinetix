@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "@/lib/gsap";
+import { useKinetix, type TabId } from "@/lib/store";
 
 const NAV_LINKS = [
-  { href: "/works", label: "WORKS" },
-  { href: "/about", label: "ABOUT" },
-  { href: "/lab", label: "LAB" },
-  { href: "/career", label: "CAREER" },
+  { href: "/works", label: "WORKS", id: "works" as TabId },
+  { href: "/about", label: "ABOUT", id: "about" as TabId },
+  { href: "/lab", label: "LAB", id: "lab" as TabId },
+  { href: "/career", label: "CAREER", id: "about" as TabId },
 ];
 
 export default function TopBar() {
@@ -17,6 +18,12 @@ export default function TopBar() {
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const setActiveTab = useKinetix((s) => s.setActiveTab);
+
+  const handleNav = (tabId: TabId) => {
+    setActiveTab(tabId);
+    setMenuOpen(false);
+  };
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -94,6 +101,7 @@ export default function TopBar() {
         {/* Wordmark */}
         <Link
           href="/"
+          onClick={() => handleNav("studio")}
           className="flex items-center gap-2.5 shrink-0 group focus:outline-none"
           aria-label="CodeKinetix home"
         >
@@ -116,6 +124,7 @@ export default function TopBar() {
               <Link
                 key={link.label}
                 href={link.href}
+                onClick={() => handleNav(link.id)}
                 className={`transition-colors uppercase ${
                   isActive
                     ? "text-volt font-bold"
@@ -134,6 +143,7 @@ export default function TopBar() {
           <Link
             ref={ctaRef}
             href="/contact"
+            onClick={() => handleNav("contact")}
             className="group flex items-center gap-2 bg-volt text-void font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.15em] px-4 sm:px-5 py-2.5 hover:bg-bone transition-colors duration-300 [-webkit-tap-highlight-color:transparent]"
             aria-label="Start a Project with CodeKinetix"
           >
@@ -180,7 +190,7 @@ export default function TopBar() {
         <div className="flex items-center justify-between border-b border-bone/10 pb-6">
           <Link
             href="/"
-            onClick={() => setMenuOpen(false)}
+            onClick={() => handleNav("studio")}
             className="flex items-center gap-2.5"
           >
             <span className="w-2.5 h-2.5 bg-volt rotate-45" />
@@ -202,7 +212,7 @@ export default function TopBar() {
           </p>
           <Link
             href="/"
-            onClick={() => setMenuOpen(false)}
+            onClick={() => handleNav("studio")}
             className="mob-link font-extrabold type-xwide uppercase text-4xl sm:text-5xl text-bone hover:text-volt transition-colors"
           >
             STUDIO
@@ -211,7 +221,7 @@ export default function TopBar() {
             <Link
               key={link.label}
               href={link.href}
-              onClick={() => setMenuOpen(false)}
+              onClick={() => handleNav(link.id)}
               className="mob-link font-extrabold type-xwide uppercase text-4xl sm:text-5xl text-bone hover:text-volt transition-colors flex items-center justify-between"
             >
               <span>{link.label}</span>
@@ -220,7 +230,7 @@ export default function TopBar() {
           ))}
           <Link
             href="/contact"
-            onClick={() => setMenuOpen(false)}
+            onClick={() => handleNav("contact")}
             className="mob-link font-extrabold type-xwide uppercase text-4xl sm:text-5xl text-volt hover:text-bone transition-colors"
           >
             START A PROJECT ↗
