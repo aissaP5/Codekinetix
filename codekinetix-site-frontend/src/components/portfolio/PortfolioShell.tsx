@@ -17,7 +17,6 @@ function getTabFromPath(path: string): TabId {
   if (path === "/") return "studio";
   if (path.startsWith("/works")) return "works";
   if (path.startsWith("/about")) return "about";
-  if (path.startsWith("/lab")) return "lab";
   if (path.startsWith("/contact")) return "contact";
   return "studio";
 }

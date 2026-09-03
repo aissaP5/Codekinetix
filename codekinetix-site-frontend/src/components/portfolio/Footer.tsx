@@ -13,7 +13,6 @@ const SOCIALS = [
 const SECTIONS = [
   { label: "WORKS", href: "/works" },
   { label: "ABOUT", href: "/about" },
-  { label: "LAB", href: "/lab" },
   { label: "CAREER", href: "/career" },
   { label: "CONTACT", href: "/contact" },
 ];
@@ -35,7 +34,7 @@ export default function Footer() {
         scrollTrigger: {
           trigger: root,
           scroller: scrollerEl,
-          start: "top 92%",
+          start: "top 98%",
           once: true,
           invalidateOnRefresh: true,
         },
@@ -86,10 +85,7 @@ export default function Footer() {
       <div className="h-[3px] w-full bg-volt" aria-hidden="true" />
       <div className="bg-grid-dark absolute inset-0 pointer-events-none mobile-hide-overlay" aria-hidden="true" />
 
-      <div className="relative z-10 px-4 sm:px-8 pt-16 sm:pt-24 pb-36">
-        <p className="ft-reveal font-mono text-[10px] tracking-[0.35em] text-volt uppercase mb-4">
-          07 — DIRECT CONTACT // CODEKINETIX
-        </p>
+      <div className="relative z-10 px-4 sm:px-8 pt-16 sm:pt-24 pb-14 sm:pb-16">
 
         <div className="ft-reveal mb-8">
           <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] leading-[0.92] text-bone text-[8vw] sm:text-[5vw] max-w-4xl">
@@ -125,7 +121,7 @@ export default function Footer() {
           <div>
             <p className="font-mono text-[10px] tracking-[0.25em] text-bone/40 uppercase mb-4">SECTIONS</p>
             <ul className="space-y-2 font-mono text-xs">
-              {SECTIONS.slice(0, 3).map((s) => (
+              {SECTIONS.slice(0, 2).map((s) => (
                 <li key={s.label}>
                   <Link href={s.href} className="text-bone/70 hover:text-volt transition-colors">
                     {s.label}
@@ -137,7 +133,7 @@ export default function Footer() {
           <div>
             <p className="font-mono text-[10px] tracking-[0.25em] text-bone/40 uppercase mb-4">EXPLORE</p>
             <ul className="space-y-2 font-mono text-xs">
-              {SECTIONS.slice(3).map((s) => (
+              {SECTIONS.slice(2).map((s) => (
                 <li key={s.label}>
                   <Link href={s.href} className="text-bone/70 hover:text-volt transition-colors">
                     {s.label}

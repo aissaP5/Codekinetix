@@ -57,9 +57,6 @@ export default function ClientsSection() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16">
           <div>
-            <p className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase mb-2">
-              INDUSTRIES WE SERVE
-            </p>
             <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-3xl sm:text-5xl lg:text-6xl leading-[0.95]">
               WHO WE BUILD FOR.
             </h2>

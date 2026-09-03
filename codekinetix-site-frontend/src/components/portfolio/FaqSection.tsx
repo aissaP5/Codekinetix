@@ -36,10 +36,6 @@ export default function FaqSection() {
     <section className="px-4 sm:px-8 py-20 sm:py-28 border-t border-bone/10 bg-void" aria-label="Frequently Asked Questions">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
         <div>
-          <p className="font-mono text-[10px] tracking-[0.35em] text-volt uppercase mb-3 flex items-center gap-2.5">
-            <span className="w-2 h-2 bg-volt rotate-45 inline-block" />
-            FREQUENTLY ASKED
-          </p>
           <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-3xl sm:text-5xl lg:text-6xl leading-[0.95]">
             COMMON QUESTIONS.
           </h2>

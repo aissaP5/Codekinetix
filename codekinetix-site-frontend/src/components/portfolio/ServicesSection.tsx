@@ -64,9 +64,6 @@ export default function ServicesSection() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 border-b border-bone/10 pb-8">
           <div>
-            <p className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase mb-2">
-              STUDIO CAPABILITIES
-            </p>
             <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-3xl sm:text-5xl lg:text-6xl leading-[0.95]">
               WHAT WE BUILD.
             </h2>

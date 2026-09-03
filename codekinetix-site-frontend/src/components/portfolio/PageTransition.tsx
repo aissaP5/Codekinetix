@@ -15,31 +15,25 @@ interface TabMeta {
 const TAB_CONFIG: Record<TabId, TabMeta> = {
   studio: {
     word: "STUDIO",
-    tag: "01 // MASTER HUB",
+    tag: "01",
     sub: "DIGITAL EXPERIENCE FLAGSHIP",
     accent: "#c6ff00",
   },
   works: {
     word: "WORKS",
-    tag: "02 // PORTFOLIO",
+    tag: "02",
     sub: "SELECTED CASE ARCHIVE",
     accent: "#f2f1ea",
   },
   about: {
     word: "ABOUT",
-    tag: "03 // IDENTITY",
+    tag: "03",
     sub: "CREATIVE ENGINEERING DNA",
     accent: "#c6ff00",
   },
-  lab: {
-    word: "LAB",
-    tag: "04 // RESEARCH",
-    sub: "BESPOKE INTERACTION SANDBOX",
-    accent: "#3a6fff",
-  },
   contact: {
     word: "CONTACT",
-    tag: "05 // TRANSMISSION",
+    tag: "04",
     sub: "COMMISSION A PROJECT",
     accent: "#ff4d00",
   },

@@ -9,12 +9,8 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="px-4 sm:px-8 pt-10 sm:pt-16 pb-32">
+    <div className="px-4 sm:px-8 pt-10 sm:pt-16 pb-8 sm:pb-12">
       <div className="max-w-4xl mx-auto mb-12">
-        <p className="font-mono text-[10px] tracking-[0.35em] text-volt uppercase mb-3 flex items-center gap-2.5">
-          <span className="w-2 h-2 bg-volt rotate-45 inline-block" />
-          START A PROJECT //
-        </p>
         <h1 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-4xl sm:text-6xl lg:text-7xl leading-[0.92] mb-6">
           HAVE AN IDEA?
           <br />
@@ -27,29 +23,6 @@ export default function ContactPage() {
 
       <div className="max-w-4xl mx-auto">
         <ProjectForm />
-      </div>
-
-      {/* Direct Contact Info Strip */}
-      <div className="max-w-4xl mx-auto mt-16 pt-10 border-t border-bone/10 grid grid-cols-1 sm:grid-cols-3 gap-6 font-mono text-xs">
-        <div>
-          <span className="text-bone/40 block text-[9px] uppercase tracking-widest mb-1">DIRECT EMAIL</span>
-          <a
-            href="mailto:codekinetixstudio@gmail.com"
-            className="text-bone hover:text-volt transition-colors"
-          >
-            codekinetixstudio@gmail.com ↗
-          </a>
-        </div>
-        <div>
-          <span className="text-bone/40 block text-[9px] uppercase tracking-widest mb-1">LOCATION & TIMEZONE</span>
-          <span className="text-bone">Global // UTC+1 (Europe & North Africa)</span>
-        </div>
-        <div>
-          <span className="text-bone/40 block text-[9px] uppercase tracking-widest mb-1">CURRENT STATUS</span>
-          <span className="text-volt font-bold flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-volt animate-ping" /> ACCEPTING CLIENT BRIEFS
-          </span>
-        </div>
       </div>
     </div>
   );

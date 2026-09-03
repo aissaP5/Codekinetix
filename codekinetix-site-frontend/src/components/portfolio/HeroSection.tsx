@@ -239,7 +239,43 @@ export default function HeroSection() {
       });
     };
 
-    /* High-Performance Render Loop */
+    /* High-Performance Render Loop — Sprite-Batched for 120 FPS */
+    // Pre-render particle circle sprites on offscreen canvases
+    const spriteCache = new Map<string, HTMLCanvasElement>();
+
+    const getSprite = (r: number, g: number, b: number, a: number, size: number): HTMLCanvasElement => {
+      const key = `${r},${g},${b},${(a * 100) | 0},${(size * 10) | 0}`;
+      let cached = spriteCache.get(key);
+      if (cached) return cached;
+
+      const s = Math.ceil(size * 2 * dpr) + 2;
+      const off = document.createElement("canvas");
+      off.width = s;
+      off.height = s;
+      const octx = off.getContext("2d")!;
+      octx.beginPath();
+      octx.arc(s / 2, s / 2, size * dpr, 0, Math.PI * 2);
+      octx.fillStyle = `rgba(${r},${g},${b},${a * 0.95})`;
+      octx.fill();
+      spriteCache.set(key, off);
+      return off;
+    };
+
+    // Build specular (white) sprite
+    const specularSprite = (() => {
+      const baseSize = isMobile ? 2.5 : 2.2;
+      const s = Math.ceil(baseSize * 2 * dpr) + 2;
+      const off = document.createElement("canvas");
+      off.width = s;
+      off.height = s;
+      const octx = off.getContext("2d")!;
+      octx.beginPath();
+      octx.arc(s / 2, s / 2, baseSize * dpr, 0, Math.PI * 2);
+      octx.fillStyle = "#ffffff";
+      octx.fill();
+      return off;
+    })();
+
     const render = (time: number) => {
       if (!isMounted) return;
       ctx.clearRect(0, 0, W, H);
@@ -311,16 +347,11 @@ export default function HeroSection() {
         const drawX = p.x + wanderX;
         const drawY = p.y + wanderY;
 
-        // 6. Direct Hardware-Accelerated Draw (Zero shadowBlur overhead)
-        ctx.beginPath();
-        ctx.arc(drawX, drawY, p.size, 0, Math.PI * 2);
-
-        if (p.specular) {
-          ctx.fillStyle = "#ffffff";
-        } else {
-          ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.a * 0.95})`;
-        }
-        ctx.fill();
+        // 6. Sprite-batched draw — single drawImage per particle (< 0.5ms total)
+        const sprite = p.specular ? specularSprite : getSprite(p.r, p.g, p.b, p.a, p.size);
+        const hw = sprite.width / (2 * dpr);
+        const hh = sprite.height / (2 * dpr);
+        ctx.drawImage(sprite, drawX - hw, drawY - hh, sprite.width / dpr, sprite.height / dpr);
       }
 
       animId = requestAnimationFrame(render);
@@ -481,18 +512,18 @@ export default function HeroSection() {
     let handleGlobalMouseMove: ((e: MouseEvent) => void) | null = null;
 
     if (!isCoarse) {
+      const qx = gsap.quickTo(stage, "x", { duration: 1.2, ease: "power3.out" });
+      const qy = gsap.quickTo(stage, "y", { duration: 1.2, ease: "power3.out" });
+      const qrY = gsap.quickTo(stage, "rotateY", { duration: 1.2, ease: "power3.out" });
+      const qrX = gsap.quickTo(stage, "rotateX", { duration: 1.2, ease: "power3.out" });
+
       handleGlobalMouseMove = (e: MouseEvent) => {
         const px = e.clientX / window.innerWidth - 0.5;
         const py = e.clientY / window.innerHeight - 0.5;
-        gsap.to(stage, {
-          x: px * 22,
-          y: py * 16,
-          rotateY: px * 6,
-          rotateX: -py * 6,
-          duration: 1.2,
-          ease: "power3.out",
-          overwrite: "auto",
-        });
+        qx(px * 22);
+        qy(py * 16);
+        qrY(px * 6);
+        qrX(-py * 6);
       };
       window.addEventListener("mousemove", handleGlobalMouseMove, { passive: true });
     }
@@ -572,7 +603,7 @@ export default function HeroSection() {
       <div className="relative z-10 w-full max-w-[1720px] mx-auto flex-1 flex flex-col lg:flex-row items-center justify-between px-6 sm:px-12 lg:px-16 pt-4 sm:pt-10 pb-6 sm:pb-10 gap-6 sm:gap-8 lg:gap-8">
         
         {/* ─── LEFT COLUMN: HERO COPY ─── */}
-        <div className="w-full lg:w-[48%] xl:w-[46%] flex flex-col justify-center order-2 lg:order-1 text-left">
+        <div className="w-full lg:w-[48%] xl:w-[46%] flex flex-col justify-center order-1 lg:order-1 text-left">
           
           {/* Scramble Headline */}
           <h1
@@ -631,7 +662,7 @@ export default function HeroSection() {
         </div>
 
         {/* ─── MID-RIGHT COLUMN: PURE INTERACTIVE PARTICLE LOGO ─── */}
-        <div className="h-stage-wrap w-full lg:w-[52%] xl:w-[54%] flex items-center justify-center order-1 lg:order-2 my-2 sm:my-0">
+        <div className="h-stage-wrap w-full lg:w-[52%] xl:w-[54%] flex items-center justify-center order-2 lg:order-2 my-2 sm:my-0">
           <div
             ref={stageRef}
             className="relative w-full max-w-[280px] xs:max-w-[310px] sm:max-w-[460px] lg:max-w-[660px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
@@ -700,7 +731,7 @@ export default function HeroSection() {
           ═══════════════════════════════════════════════════════ */}
       <div className="h-edge relative z-10 w-full max-w-[1720px] mx-auto px-5 sm:px-10 lg:px-16 pb-16 sm:pb-8 pt-3 border-t border-bone/10 hidden sm:flex items-center justify-between font-mono text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-bone/40">
         <div>
-          EST. 2021 · CODEKINETIX® // CRAFTED WITH PASSION
+          EST. 2021 · CODEKINETIX®
         </div>
 
         <div className="flex items-center gap-3">

@@ -9,7 +9,6 @@ import { useKinetix, type TabId } from "@/lib/store";
 const NAV_LINKS = [
   { href: "/works", label: "WORKS", id: "works" as TabId },
   { href: "/about", label: "ABOUT", id: "about" as TabId },
-  { href: "/lab", label: "LAB", id: "lab" as TabId },
   { href: "/career", label: "CAREER", id: "about" as TabId },
 ];
 
@@ -207,9 +206,7 @@ export default function TopBar() {
         </div>
 
         <nav className="my-auto py-8 flex flex-col gap-4">
-          <p className="font-mono text-[10px] tracking-[0.3em] text-ash uppercase mb-2">
-            NAVIGATION //
-          </p>
+
           <Link
             href="/"
             onClick={() => handleNav("studio")}

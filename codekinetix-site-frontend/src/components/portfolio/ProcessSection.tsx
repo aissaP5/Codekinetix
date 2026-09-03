@@ -88,9 +88,6 @@ export default function ProcessSection() {
         {/* Editorial Section Header */}
         <div className="process-reveal flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 sm:mb-20 pb-8 border-b border-bone/10">
           <div>
-            <span className="font-mono text-[10px] tracking-[0.35em] text-volt uppercase block mb-3">
-              METHODOLOGY & TIMELINE
-            </span>
             <h2 className="font-extrabold type-xwide uppercase tracking-[-0.03em] text-bone text-3xl sm:text-5xl lg:text-7xl leading-[0.92]">
               HOW AN EXPERIENCE IS FORGED.
             </h2>

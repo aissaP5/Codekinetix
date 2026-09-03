@@ -182,14 +182,10 @@ export default function WorksPage() {
   }, [selectedCat, viewMode]);
 
   return (
-    <div ref={rootRef} className="pb-32">
+    <div ref={rootRef} className="pb-8 sm:pb-12">
       {/* Header */}
       <div className="px-4 sm:px-8 pt-10 sm:pt-16 pb-8">
         <div className="max-w-4xl mb-10">
-          <p className="font-mono text-[10px] tracking-[0.35em] text-volt uppercase mb-3 flex items-center gap-2.5">
-            <span className="w-2 h-2 bg-volt rotate-45 inline-block" />
-            PORTFOLIO ARCHIVE //
-          </p>
           <h1 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-4xl sm:text-6xl lg:text-7xl leading-[0.92] mb-6">
             SELECTED WORKS.
           </h1>

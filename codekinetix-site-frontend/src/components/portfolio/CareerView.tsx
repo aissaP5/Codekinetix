@@ -214,12 +214,9 @@ export default function CareerView() {
   ];
 
   return (
-    <div ref={rootRef} className="pb-32">
+    <div ref={rootRef} className="pb-8 sm:pb-12">
       {/* header */}
       <div className="px-4 sm:px-8 pt-10 sm:pt-16 mb-12 sm:mb-16">
-        <p className="cr-reveal font-mono text-[10px] tracking-[0.3em] text-ash mb-4">
-          <span className="text-volt font-bold">03</span> — CAREER
-        </p>
         <h2 className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.02em] text-[13vw] sm:text-[9vw]">
           {headerLines.map(([line, isOutline], li) => (
             <span key={li} className="block overflow-hidden pb-1 whitespace-nowrap">

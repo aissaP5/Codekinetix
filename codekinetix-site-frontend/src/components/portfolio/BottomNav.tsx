@@ -10,7 +10,6 @@ const TABS = [
   { id: "studio", label: "STUDIO", href: "/" },
   { id: "works", label: "WORKS", href: "/works" },
   { id: "about", label: "ABOUT", href: "/about" },
-  { id: "lab", label: "LAB", href: "/lab" },
   { id: "contact", label: "CONTACT", href: "/contact" },
 ];
 
@@ -27,8 +26,6 @@ export default function BottomNav() {
       ? "works"
       : pathname.startsWith("/about")
       ? "about"
-      : pathname.startsWith("/lab")
-      ? "lab"
       : pathname.startsWith("/contact")
       ? "contact"
       : "studio";

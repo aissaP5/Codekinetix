@@ -122,14 +122,10 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div ref={rootRef} className="pb-28">
+    <div ref={rootRef} className="pb-8 sm:pb-12">
       {/* ──────────────────────────────────────────────── HERO & STORY */}
       <section className="px-4 sm:px-8 pt-10 sm:pt-16 pb-16">
         <div className="max-w-4xl mb-12">
-          <div className="about-fade flex items-center gap-3 font-mono text-[10px] text-volt uppercase tracking-[0.35em] mb-4">
-            <span className="w-2 h-2 bg-volt rotate-45" />
-            <span>ESTABLISHED 2021 // DIGITAL EXPERIENCE STUDIO</span>
-          </div>
           <h1 className="about-fade font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-4xl sm:text-6xl lg:text-7xl leading-[0.92] mb-6">
             DESIGN × CODE × MOTION.
           </h1>
@@ -141,9 +137,6 @@ export default function AboutPage() {
         {/* Studio Story Grid */}
         <div className="about-fade max-w-4xl pt-8 border-t border-bone/10 grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              THE ORIGIN
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               WHO WE ARE.
             </h2>
@@ -201,9 +194,6 @@ export default function AboutPage() {
       {/* ──────────────────────────────────── STUDIO STANDARDS */}
       <section className="px-4 sm:px-8 py-20 sm:py-28 bg-void" aria-label="Studio Standards">
         <div className="max-w-4xl mx-auto mb-14">
-          <p className="font-mono text-[10px] tracking-[0.35em] text-volt uppercase mb-2">
-            STUDIO STANDARDS
-          </p>
           <h2 className="font-extrabold type-xwide uppercase text-3xl sm:text-5xl text-bone leading-[0.95]">
             HOW WE OPERATE.
           </h2>

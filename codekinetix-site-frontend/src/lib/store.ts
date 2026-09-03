@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { getSlot } from "@/lib/projects";
 
-export type TabId = "studio" | "works" | "about" | "lab" | "contact";
+export type TabId = "studio" | "works" | "about" | "contact";
 
 export type Phase =
   | "booting" // preloader visible

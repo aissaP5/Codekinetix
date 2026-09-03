@@ -71,13 +71,13 @@ export default function CaseStudyClient({
   const { caseStudy } = slot;
 
   return (
-    <div ref={rootRef} className="pb-28">
+    <div ref={rootRef} className="pb-8 sm:pb-12">
       {/* Top Breadcrumb Header */}
       <div className="px-4 sm:px-8 pt-8 pb-4 border-b border-bone/10 flex items-center justify-between font-mono text-[10px] tracking-widest text-ash uppercase">
         <Link href="/works" className="hover:text-volt transition-colors flex items-center gap-1.5">
           ← BACK TO WORKS
         </Link>
-        <span className="text-volt font-bold">CASE STUDY // {slot.index}</span>
+        <span className="text-volt font-bold">{slot.index}</span>
       </div>
 
       {/* Main Title & Hero Banner */}
@@ -152,9 +152,6 @@ export default function CaseStudyClient({
         {/* 1. The Challenge */}
         <div className="cs-section border-t border-bone/10 pt-10 grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              01 // CONTEXT
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               THE CHALLENGE
             </h2>
@@ -169,9 +166,6 @@ export default function CaseStudyClient({
         {/* 2. The Approach */}
         <div className="cs-section border-t border-bone/10 pt-10 grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              02 // STRATEGY
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               THE APPROACH
             </h2>
@@ -186,9 +180,6 @@ export default function CaseStudyClient({
         {/* 3. The Design */}
         <div className="cs-section border-t border-bone/10 pt-10 grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              03 // ART DIRECTION
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               THE DESIGN
             </h2>
@@ -203,9 +194,6 @@ export default function CaseStudyClient({
         {/* 4. The Experience */}
         <div className="cs-section border-t border-bone/10 pt-10 grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              04 // INTERACTION & MOTION
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               THE EXPERIENCE
             </h2>
@@ -220,9 +208,6 @@ export default function CaseStudyClient({
         {/* 5. Technology Stack */}
         <div className="cs-section border-t border-bone/10 pt-10 grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              05 // ARCHITECTURE
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               THE TECHNOLOGY
             </h2>
@@ -245,9 +230,6 @@ export default function CaseStudyClient({
         {/* 6. Deliverables */}
         <div className="cs-section border-t border-bone/10 pt-10 grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-4">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-volt uppercase block mb-1">
-              06 // DELIVERABLES
-            </span>
             <h2 className="font-extrabold type-wide uppercase text-2xl text-bone">
               WHAT WAS DELIVERED
             </h2>
@@ -272,9 +254,7 @@ export default function CaseStudyClient({
       <section className="px-4 sm:px-8 py-12">
         <div className="border border-bone/20 bg-panel/60 p-8 sm:p-12 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-5xl mx-auto">
           <div>
-            <span className="font-mono text-[9px] tracking-widest text-volt uppercase mb-2 block">
-              LIVE DEMO & PREVIEW
-            </span>
+
             <h3 className="font-extrabold type-xwide uppercase text-2xl sm:text-3xl text-bone">
               EXPERIENCE {slot.name} DIRECTLY.
             </h3>
@@ -297,7 +277,7 @@ export default function CaseStudyClient({
       <section className="px-4 sm:px-8 pt-12 border-t border-bone/10">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <span className="font-mono text-xs text-ash tracking-widest uppercase">
-            NEXT PROJECT IN ARCHIVE //
+            NEXT PROJECT
           </span>
           <Link
             href={`/works/${nextSlot.slug}`}
