@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { gsap } from "@/lib/gsap";
-import ParticleWord from "@/components/portfolio/ParticleWord";
+import HeroSection from "@/components/portfolio/HeroSection";
 import ValuePillars from "@/components/portfolio/ValuePillars";
 import ServicesSection from "@/components/portfolio/ServicesSection";
 import ProcessSection from "@/components/portfolio/ProcessSection";
@@ -147,56 +147,7 @@ export default function HomePage() {
   return (
     <div ref={rootRef} className="pb-12">
       {/* ──────────────────────────────────────────────── HERO */}
-      <section className="relative flex flex-col min-h-[90vh] px-4 sm:px-8 pt-8 pb-16 justify-between overflow-hidden">
-        <div>
-          <div className="hero-fade flex flex-wrap items-center justify-between gap-4 font-mono text-[10px] tracking-[0.3em] text-bone/50 mb-8 sm:mb-12">
-            <span className="text-volt font-bold">
-              AVAILABLE FOR PROJECTS
-            </span>
-            <span className="hidden sm:inline">DIGITAL EXPERIENCE STUDIO</span>
-            <span>DESIGN × CODE × MOTION</span>
-          </div>
-
-          <div className="flex items-center justify-center my-6 sm:my-10">
-            <h1 className="select-none text-center" aria-label="CodeKinetix — Digital Experience Studio">
-              <span className="sr-only">
-                CodeKinetix is an independent digital experience studio. We build digital experiences people remember.
-              </span>
-              <span className="block" aria-hidden="true">
-                <ParticleWord
-                  text="CODEKINETIX"
-                  className="relative block w-[7.1em] h-[0.82em] text-[min(13.4vw,26vh)] sm:text-[min(12.8vw,26vh)] select-none"
-                />
-              </span>
-            </h1>
-          </div>
-        </div>
-
-        <div className="border-t border-bone/10 pt-8 sm:pt-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-          <div className="hero-fade max-w-2xl">
-            <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] leading-[0.95] text-bone text-3xl sm:text-5xl lg:text-6xl">
-              WE BUILD DIGITAL EXPERIENCES PEOPLE REMEMBER.
-            </h2>
-          </div>
-
-          <div className="hero-fade flex flex-wrap items-center gap-4 shrink-0">
-            <Link
-              href="/contact"
-              data-cursor="open"
-              className="bg-volt text-void font-mono text-xs font-bold tracking-[0.2em] px-7 py-4 hover:bg-bone transition-colors uppercase flex items-center gap-2 group cursor-pointer"
-            >
-              START A PROJECT
-              <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
-            </Link>
-            <Link
-              href="/works"
-              className="border border-bone/25 text-bone font-mono text-xs font-bold tracking-[0.2em] px-6 py-4 hover:border-volt hover:text-volt transition-colors uppercase"
-            >
-              VIEW WORKS ↓
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* ──────────────────────────────────────── VALUE PILLARS */}
       <ValuePillars />
