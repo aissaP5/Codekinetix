@@ -283,11 +283,10 @@
   will-change: transform;
   contain: layout style paint;
 }
-/* R31 — the falling/exploding letters are 18vw glyphs animated with
-   transform+opacity; without promotion some browsers repaint them on
-   the main thread every frame of the transition. ~10 small layers. */
-.pt-letter {
+/* pt-content: the typography block shown during the transition cover */
+.pt-content {
   will-change: transform, opacity;
+  contain: layout style;
 }
 
 /* ── embedded project shell — loading plate ───────────────────── */

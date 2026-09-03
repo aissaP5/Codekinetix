@@ -106,19 +106,6 @@ export default function HomePage() {
     const scrollerEl = root.closest("main") ?? undefined;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".hero-fade",
-        { opacity: 0, y: 25 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          delay: 0.3,
-          ease: "power3.out",
-        }
-      );
-
       gsap.utils.toArray<HTMLElement>(".feat-card").forEach((card) => {
         gsap.fromTo(
           card,

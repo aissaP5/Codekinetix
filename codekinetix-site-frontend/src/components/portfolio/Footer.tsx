@@ -19,55 +19,81 @@ const SECTIONS = [
 
 export default function Footer() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const wordSlideRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const hasRevealedRef = useRef(false);
 
   useEffect(() => {
     const root = rootRef.current;
+    const wordSlide = wordSlideRef.current;
     if (!root) return;
     const scrollerEl = root.closest("main") ?? undefined;
 
+    const reveals = Array.from(root.querySelectorAll<HTMLElement>(".ft-reveal"));
+    const wordEl = root.querySelector<HTMLElement>(".ft-word");
+
     const ctx = gsap.context(() => {
-      gsap.set(".ft-reveal", { opacity: 0, y: 30 });
-      gsap.set(".ft-word", { yPercent: 110 });
+      if (!hasRevealedRef.current) {
+        if (reveals.length) gsap.set(reveals, { opacity: 0, y: 25 });
+        if (wordSlide) gsap.set(wordSlide, { yPercent: 105 });
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          scroller: scrollerEl,
-          start: "top 98%",
-          once: true,
-          invalidateOnRefresh: true,
-        },
-      });
-      tl.to(".ft-reveal", { opacity: 1, y: 0, duration: 0.6, stagger: 0.07, ease: "power3.out" }).to(
-        ".ft-word",
-        { yPercent: 0, duration: 0.9, ease: "power4.out" },
-        "-=0.4"
-      );
-
-      /* giant wordmark drifts sideways as the footer scrolls past */
-      gsap.fromTo(
-        ".ft-word",
-        { xPercent: 4 },
-        {
-          xPercent: -4,
-          ease: "none",
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: root,
             scroller: scrollerEl,
-            start: "top bottom",
-            end: "bottom bottom",
-            scrub: 0.6,
-            invalidateOnRefresh: true,
+            start: "top 95%",
+            once: true,
+            onEnter: () => {
+              hasRevealedRef.current = true;
+            },
           },
+        });
+
+        if (reveals.length) {
+          tl.to(reveals, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06, ease: "power3.out" });
         }
-      );
+        if (wordSlide) {
+          tl.to(
+            wordSlide,
+            {
+              yPercent: 0,
+              duration: 0.85,
+              ease: "power4.out",
+              onComplete: () => { hasRevealedRef.current = true; },
+            },
+            reveals.length ? "-=0.35" : 0
+          );
+        }
+      } else {
+        // Already revealed — snap to final state without re-animating
+        if (reveals.length) gsap.set(reveals, { opacity: 1, y: 0 });
+        if (wordSlide) gsap.set(wordSlide, { yPercent: 0 });
+      }
+
+      /* Giant wordmark lateral parallax drift as footer scrolls past */
+      if (wordEl) {
+        gsap.fromTo(
+          wordEl,
+          { xPercent: 3 },
+          {
+            xPercent: -3,
+            ease: "none",
+            scrollTrigger: {
+              trigger: root,
+              scroller: scrollerEl,
+              start: "top bottom",
+              end: "bottom bottom",
+              scrub: 0.5,
+              invalidateOnRefresh: true,
+            },
+          }
+        );
+      }
     }, root);
 
-    // Refresh triggers once layout stabilizes
     const t = setTimeout(() => {
       ScrollTrigger.refresh();
-    }, 100);
+    }, 150);
 
     return () => {
       clearTimeout(t);
@@ -175,19 +201,21 @@ export default function Footer() {
         </div>
 
         <div className="ft-reveal mt-16 overflow-hidden">
-          <p
-            className="ft-word font-extrabold type-xwide uppercase tracking-[-0.02em] leading-none text-[12vw] sm:text-[9vw] opacity-40 text-center select-none"
-            aria-hidden="true"
-          >
-            {"CodeKinetix".split("").map((c, i) => (
-              <span
-                key={i}
-                className="inline-block text-stroke-bone hover:text-volt hover:-translate-y-[0.07em] transition-[color,translate] duration-300 ease-out cursor-default"
-              >
-                {c}
-              </span>
-            ))}
-          </p>
+          <div ref={wordSlideRef} className="ft-word-slide will-change-transform">
+            <p
+              className="ft-word font-extrabold type-xwide uppercase tracking-[-0.02em] leading-none text-[12vw] sm:text-[9vw] opacity-40 text-center select-none"
+              aria-hidden="true"
+            >
+              {"CodeKinetix".split("").map((c, i) => (
+                <span
+                  key={i}
+                  className="inline-block text-stroke-bone hover:text-volt hover:-translate-y-[0.07em] transition-[color,translate] duration-300 ease-out cursor-default"
+                >
+                  {c}
+                </span>
+              ))}
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 mt-8 font-mono text-[10px] text-bone/40 tracking-wide">

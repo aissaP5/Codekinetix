@@ -76,6 +76,11 @@ export default function HeroSection() {
     const stage  = stageRef.current;
     if (!canvas || !stage) return;
 
+    // Skip particle engine entirely on mobile — canvas is hidden by CSS
+    // and running it wastes CPU, memory, and battery on phones
+    const isMobileViewport = () => window.innerWidth < 640;
+    if (isMobileViewport()) return;
+
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
@@ -196,8 +201,8 @@ export default function HeroSection() {
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Adaptive particle budget: ~1950 on mobile for rich density; 2800 on desktop
-      const targetCount = isMobile ? 1950 : 2800;
+      // Adaptive particle budget: ~900 on mobile for 60fps; 2400 on desktop
+      const targetCount = isMobile ? 900 : 2400;
       const step = Math.max(1, rawHits.length / targetCount);
 
       const sampled: RawHit[] = [];
@@ -205,8 +210,8 @@ export default function HeroSection() {
         sampled.push(rawHits[Math.floor(i)]);
       }
 
-      // Logo sizing: scaled comfortably in center with ample boundary margin
-      const logoScale = Math.min(W * (isMobile ? 0.72 : 0.76), H * (isMobile ? 0.66 : 0.66), 460);
+      // Logo sizing: fill the stage generously, extra scale on mobile for visual impact
+      const logoScale = Math.min(W * (isMobile ? 0.82 : 0.76), H * (isMobile ? 0.78 : 0.66), isMobile ? 380 : 460);
       const centerX = W / 2;
       const centerY = H / 2;
 
@@ -230,7 +235,7 @@ export default function HeroSection() {
           g: boostG,
           b: boostB,
           a: pt.a,
-          size: pt.specular ? (isMobile ? 2.5 : 2.2) : (isMobile ? 2.0 : 1.6),
+          size: pt.specular ? (isMobile ? 3.2 : 2.2) : (isMobile ? 2.5 : 1.6),
           phase: Math.random() * Math.PI * 2,
           freq: 0.0014 + Math.random() * 0.0016,
           amp: isMobile ? 0.8 + Math.random() * 1.2 : 1.2 + Math.random() * 2.0,
@@ -278,6 +283,11 @@ export default function HeroSection() {
 
     const render = (time: number) => {
       if (!isMounted) return;
+      // Pause rendering when tab/page is hidden to save battery & CPU
+      if (document.hidden) {
+        animId = 0;
+        return;
+      }
       ctx.clearRect(0, 0, W, H);
 
       // Process shockwaves / ripples
@@ -407,10 +417,19 @@ export default function HeroSection() {
     stage.addEventListener("pointerdown", handlePointerDown, { passive: true });
     window.addEventListener("resize", handleResize);
 
+    // Pause rAF loop when tab is hidden; resume when visible again
+    const handleVisibilityChange = () => {
+      if (!document.hidden && !animId && isMounted && particles.length > 0) {
+        animId = requestAnimationFrame(render);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       isMounted = false;
       clearTimeout(resizeTimer);
       cancelAnimationFrame(animId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       stage.removeEventListener("pointermove", handlePointerMove);
       stage.removeEventListener("pointerleave", handlePointerLeave);
       stage.removeEventListener("pointerdown", handlePointerDown);
@@ -514,8 +533,8 @@ export default function HeroSection() {
     if (!isCoarse) {
       const qx = gsap.quickTo(stage, "x", { duration: 1.2, ease: "power3.out" });
       const qy = gsap.quickTo(stage, "y", { duration: 1.2, ease: "power3.out" });
-      const qrY = gsap.quickTo(stage, "rotateY", { duration: 1.2, ease: "power3.out" });
-      const qrX = gsap.quickTo(stage, "rotateX", { duration: 1.2, ease: "power3.out" });
+      const qrY = gsap.quickTo(stage, "rotationY", { duration: 1.2, ease: "power3.out" });
+      const qrX = gsap.quickTo(stage, "rotationX", { duration: 1.2, ease: "power3.out" });
 
       handleGlobalMouseMove = (e: MouseEvent) => {
         const px = e.clientX / window.innerWidth - 0.5;
@@ -597,29 +616,105 @@ export default function HeroSection() {
       {/* ═══ NOISE TEXTURE OVERLAY ═══ */}
       <div className="noise-overlay absolute inset-0 z-40 pointer-events-none opacity-[0.035]" aria-hidden="true" />
 
-      {/* ═══════════════════════════════════════════════════════
-          MAIN HERO CONTENT: SPLIT ON DESKTOP, FLUID ON MOBILE
-          ═══════════════════════════════════════════════════════ */}
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto flex-1 flex flex-col lg:flex-row items-center justify-between px-6 sm:px-12 lg:px-16 pt-4 sm:pt-10 pb-6 sm:pb-10 gap-6 sm:gap-8 lg:gap-8">
-        
-        {/* ─── LEFT COLUMN: HERO COPY ─── */}
-        <div className="w-full lg:w-[48%] xl:w-[46%] flex flex-col justify-center order-1 lg:order-1 text-left">
-          
-          {/* Scramble Headline */}
+      {/* ─────────────────────────────────────────────────────────
+          MOBILE HERO (< sm) — full-bleed type layout, no canvas
+          ───────────────────────────────────────────────────────── */}
+      <div className="sm:hidden relative z-10 flex flex-col flex-1 px-5 pt-8 pb-6 justify-between">
+        {/* Mobile top label */}
+        <div className="flex items-center justify-between font-mono text-[9px] tracking-[0.28em] uppercase text-bone/40 mb-8">
+          <span><span className="text-volt font-bold">●</span> CODEKINETIX®</span>
+          <span>EST. 2021</span>
+        </div>
+
+        {/* Mobile headline — fills width */}
+        <div className="flex-1 flex flex-col justify-center">
           <h1
-            className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.015em] sm:tracking-[-0.05em]"
-            style={{ fontSize: "clamp(24px, 5vw, 62px)" }}
+            className="font-extrabold type-xwide uppercase leading-[0.88] tracking-[-0.02em] text-bone mb-6"
+            style={{ fontSize: "clamp(38px, 13vw, 56px)" }}
             aria-label="We build digital experiences people remember."
           >
             {LINES.map((line, li) => (
-              <span key={li} className="block overflow-hidden pl-1 sm:pl-2 py-0.5">
+              <span key={li} className="block overflow-hidden py-0.5">
+                <span className={`h-ln block ${line.cls}`}>
+                  {line.text.split("").map((ch, ci) => (
+                    <span key={ci} className="h-ch inline-block" data-char={ch}>
+                      {ch === " " ? "\u00A0" : ch}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            ))}
+          </h1>
+
+          {/* Volt accent divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-px flex-1 bg-volt/30" />
+            <span className="font-mono text-[9px] tracking-[0.3em] text-volt uppercase">DESIGN × CODE × MOTION</span>
+            <div className="h-px w-6 bg-volt/30" />
+          </div>
+
+          {/* Description */}
+          <p className="h-desc font-serif italic text-[14px] leading-[1.65] text-bone/60 mb-8 max-w-[340px]">
+            Bespoke digital experiences engineered from raw code — not templates.
+          </p>
+
+          {/* Stat chips row */}
+          <div className="flex items-center gap-2 mb-8 flex-wrap">
+            {[["100%", "CUSTOM CODE"], ["60fps", "ANIMATIONS"], ["24H", "RESPONSE"]].map(([val, lbl]) => (
+              <div key={lbl} className="flex flex-col items-center px-3 py-2 border border-bone/10 bg-void/60 backdrop-blur-sm">
+                <span className="font-extrabold type-xwide text-volt text-sm leading-none">{val}</span>
+                <span className="font-mono text-[7px] tracking-[0.2em] text-bone/40 mt-0.5">{lbl}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile CTAs */}
+        <div className="h-act flex flex-col gap-3">
+          <Link
+            ref={ctaRef}
+            href="/contact"
+            className="group relative inline-flex items-center justify-center gap-3 h-[50px] overflow-hidden border border-bone text-void font-mono text-[10px] font-extrabold tracking-[0.18em] uppercase bg-bone transition-all duration-300"
+          >
+            <span className="absolute inset-0 bg-volt translate-y-full group-hover:translate-y-0 transition-transform duration-[450ms] ease-[cubic-bezier(.16,1,.3,1)]" />
+            <span className="relative z-[2] group-hover:text-bone transition-colors duration-300">START A PROJECT</span>
+            <span className="relative z-[2] text-[14px] font-normal group-hover:text-bone group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300">↗</span>
+          </Link>
+          <Link
+            href="/works"
+            className="inline-flex items-center justify-center gap-3 h-[46px] font-mono text-[10px] tracking-[0.18em] uppercase border border-bone/15 text-bone/60"
+          >
+            VIEW WORKS <span>↓</span>
+          </Link>
+        </div>
+
+        {/* Mobile scroll cue */}
+        <div className="mt-6 flex items-center justify-center gap-2 font-mono text-[8px] tracking-[0.25em] uppercase text-bone/30">
+          <span className="w-4 h-px bg-bone/20" />
+          SCROLL TO EXPLORE
+          <span className="w-4 h-px bg-bone/20" />
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────
+          DESKTOP HERO (sm+) — split layout with particle logo
+          ───────────────────────────────────────────────────────── */}
+      <div className="hidden sm:flex relative z-10 w-full max-w-[1720px] mx-auto flex-1 flex-col lg:flex-row items-center justify-between px-12 lg:px-16 pt-10 pb-10 gap-8 lg:gap-8">
+
+        {/* ─── LEFT COLUMN: HERO COPY ─── */}
+        <div className="w-full lg:w-[48%] xl:w-[46%] flex flex-col justify-center order-1 lg:order-1 text-left">
+
+          {/* Scramble Headline */}
+          <h1
+            className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.05em]"
+            style={{ fontSize: "clamp(32px, 5vw, 62px)" }}
+            aria-label="We build digital experiences people remember."
+          >
+            {LINES.map((line, li) => (
+              <span key={li} className="block overflow-hidden pl-2 py-0.5">
                 <span className={`h-ln block whitespace-nowrap ${line.cls}`}>
                   {line.text.split("").map((ch, ci) => (
-                    <span
-                      key={ci}
-                      className="h-ch inline-block"
-                      data-char={ch}
-                    >
+                    <span key={ci} className="h-ch inline-block" data-char={ch}>
                       {ch === " " ? "\u00A0" : ch}
                     </span>
                   ))}
@@ -629,18 +724,18 @@ export default function HeroSection() {
           </h1>
 
           {/* Editorial Description */}
-          <p className="h-desc max-w-[480px] mt-4 sm:mt-6 font-serif italic text-[14px] sm:text-[16px] leading-[1.6] text-bone/65 pl-1">
+          <p className="h-desc max-w-[480px] mt-6 font-serif italic text-[16px] leading-[1.6] text-bone/65 pl-1">
             <strong className="text-bone font-medium not-italic">Design × Code × Motion</strong>{" "}
             engineered into bespoke digital experiences built from raw code — not templates.
           </p>
 
           {/* CTA Actions */}
-          <div className="h-act flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-8 w-full sm:w-auto pl-1">
+          <div className="h-act flex flex-row items-center gap-4 mt-8 pl-1">
             {/* Primary CTA */}
             <Link
               ref={ctaRef}
               href="/contact"
-              className="group relative inline-flex items-center justify-center gap-3 h-[48px] sm:h-[52px] px-6 sm:px-7 overflow-hidden border border-bone text-void font-mono text-[10px] font-extrabold tracking-[0.18em] uppercase cursor-pointer bg-bone transition-all duration-300"
+              className="group relative inline-flex items-center justify-center gap-3 h-[52px] px-7 overflow-hidden border border-bone text-void font-mono text-[10px] font-extrabold tracking-[0.18em] uppercase cursor-pointer bg-bone transition-all duration-300"
             >
               <span className="absolute inset-0 bg-volt translate-y-full group-hover:translate-y-0 transition-transform duration-[450ms] ease-[cubic-bezier(.16,1,.3,1)]" />
               <span className="relative z-[2] group-hover:text-bone transition-colors duration-300">
@@ -654,41 +749,38 @@ export default function HeroSection() {
             {/* Secondary CTA */}
             <Link
               href="/works"
-              className="inline-flex items-center justify-center gap-3 h-[48px] sm:h-[52px] px-5 sm:px-6 font-mono text-[10px] tracking-[0.18em] uppercase border border-bone/20 text-bone/70 hover:border-volt hover:text-volt transition-all duration-300"
+              className="inline-flex items-center justify-center gap-3 h-[52px] px-6 font-mono text-[10px] tracking-[0.18em] uppercase border border-bone/20 text-bone/70 hover:border-volt hover:text-volt transition-all duration-300"
             >
               VIEW WORKS <span>↓</span>
             </Link>
           </div>
         </div>
 
-        {/* ─── MID-RIGHT COLUMN: PURE INTERACTIVE PARTICLE LOGO ─── */}
-        <div className="h-stage-wrap w-full lg:w-[52%] xl:w-[54%] flex items-center justify-center order-2 lg:order-2 my-2 sm:my-0">
+        {/* ─── RIGHT COLUMN: INTERACTIVE PARTICLE LOGO (desktop only) ─── */}
+        <div className="h-stage-wrap w-full lg:w-[52%] xl:w-[54%] flex items-center justify-center order-2 lg:order-2">
           <div
             ref={stageRef}
-            className="relative w-full max-w-[280px] xs:max-w-[310px] sm:max-w-[460px] lg:max-w-[660px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
+            className="relative w-full max-w-[480px] lg:max-w-[660px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
             style={{ perspective: "1000px" }}
           >
             {/* Ambient Radial Volt Halo */}
             <div
-              className="absolute inset-[6%] rounded-full blur-[35px] sm:blur-[50px] pointer-events-none opacity-85 group-hover:opacity-100 transition-opacity duration-700"
+              className="absolute inset-[4%] rounded-full blur-[55px] pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity duration-700"
               style={{
-                background: `radial-gradient(circle, rgba(${VOLT_RGB},0.30), rgba(${VOLT_RGB},0.06) 50%, transparent 75%)`,
+                background: `radial-gradient(circle, rgba(${VOLT_RGB},0.36), rgba(${VOLT_RGB},0.10) 50%, transparent 78%)`,
               }}
               aria-hidden="true"
             />
 
             {/* Rotating SVG Orbital Wireframe Rings */}
             <svg
-              className="absolute inset-0 w-full h-full pointer-events-none overflow-visible opacity-80 sm:opacity-100"
+              className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
               viewBox="0 0 600 450"
               aria-hidden="true"
             >
               <ellipse
                 className="h-orbit-ring"
-                cx="300"
-                cy="225"
-                rx="235"
-                ry="125"
+                cx="300" cy="225" rx="235" ry="125"
                 fill="none"
                 stroke={`rgba(${BONE_RGB},0.06)`}
                 strokeWidth="0.7"
@@ -696,19 +788,14 @@ export default function HeroSection() {
               />
               <ellipse
                 className="h-orbit-ring-rev"
-                cx="300"
-                cy="225"
-                rx="205"
-                ry="90"
+                cx="300" cy="225" rx="205" ry="90"
                 transform="rotate(-22 300 225)"
                 fill="none"
                 stroke={`rgba(${VOLT_RGB},0.25)`}
                 strokeWidth="0.75"
               />
               <circle
-                cx="300"
-                cy="225"
-                r="160"
+                cx="300" cy="225" r="160"
                 fill="none"
                 stroke={`rgba(${VOLT_RGB},0.10)`}
                 strokeWidth="0.6"
@@ -727,9 +814,9 @@ export default function HeroSection() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════
-          BOTTOM EDGE BAR (DESKTOP / TABLET)
+          BOTTOM EDGE BAR (DESKTOP / TABLET only)
           ═══════════════════════════════════════════════════════ */}
-      <div className="h-edge relative z-10 w-full max-w-[1720px] mx-auto px-5 sm:px-10 lg:px-16 pb-16 sm:pb-8 pt-3 border-t border-bone/10 hidden sm:flex items-center justify-between font-mono text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-bone/40">
+      <div className="h-edge relative z-10 w-full max-w-[1720px] mx-auto px-10 lg:px-16 pb-8 pt-3 border-t border-bone/10 hidden sm:flex items-center justify-between font-mono text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-bone/40">
         <div>
           EST. 2021 · CODEKINETIX®
         </div>

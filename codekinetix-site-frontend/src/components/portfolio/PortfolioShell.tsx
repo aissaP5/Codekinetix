@@ -66,9 +66,11 @@ function RouteTransitionContainer({
     if (contentTab === targetTab) {
       setDisplayedChildren(children);
       scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
-      setTimeout(() => {
+      // Give the page time to paint before recalculating scroll triggers
+      const t = setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 50);
+      }, 200);
+      return () => clearTimeout(t);
     }
   }, [contentTab, targetTab, children, scrollRef]);
 
