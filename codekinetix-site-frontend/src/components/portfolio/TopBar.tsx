@@ -234,7 +234,23 @@ export default function TopBar() {
         </nav>
 
         <div className="pt-6 border-t border-bone/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-[10px] text-ash">
-          <span>INDEPENDENT DIGITAL EXPERIENCE STUDIO</span>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/privacy"
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-volt transition-colors uppercase tracking-wider"
+            >
+              PRIVACY
+            </Link>
+            <span className="text-bone/20" aria-hidden="true">•</span>
+            <Link
+              href="/terms"
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-volt transition-colors uppercase tracking-wider"
+            >
+              TERMS
+            </Link>
+          </div>
           <span>AVAILABLE FOR NEW PROJECTS</span>
         </div>
       </div>

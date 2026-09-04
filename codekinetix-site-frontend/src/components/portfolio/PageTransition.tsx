@@ -45,6 +45,12 @@ const COLS = 7;
 let navHandler: ((href: string, push: (url: string) => void) => void) | null = null;
 
 export function navigateWithTransition(href: string, push: (url: string) => void) {
+  const path = href.split("?")[0].split("#")[0];
+  // Direct instant navigation for utility and legal documentation
+  if (path.startsWith("/privacy") || path.startsWith("/terms")) {
+    push(href);
+    return;
+  }
   if (navHandler) {
     navHandler(href, push);
   } else {
@@ -74,6 +80,25 @@ function getTransitionMeta(href: string): {
         targetTab: "works",
       };
     }
+  }
+
+  if (path.startsWith("/privacy")) {
+    return {
+      word: "PRIVACY",
+      tag: "LEGAL",
+      sub: "DATA PRIVACY & COOKIES",
+      accent: "#9d9d94",
+      targetTab: "studio",
+    };
+  }
+  if (path.startsWith("/terms")) {
+    return {
+      word: "TERMS",
+      tag: "LEGAL",
+      sub: "TERMS OF SERVICE",
+      accent: "#9d9d94",
+      targetTab: "studio",
+    };
   }
 
   if (path === "/" || path === "") {

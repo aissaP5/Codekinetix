@@ -228,9 +228,24 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom meta row on the left side */}
+        {/* Bottom meta row */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-8 pt-6 border-t border-bone/10 font-mono text-[10px] text-bone/40 tracking-wide text-left">
           <span>CODEKINETIX® — DIGITAL EXPERIENCE STUDIO</span>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <Link
+              href="/privacy"
+              className="text-bone/50 hover:text-volt transition-colors uppercase tracking-widest"
+            >
+              PRIVACY POLICY
+            </Link>
+            <span className="text-bone/20" aria-hidden="true">•</span>
+            <Link
+              href="/terms"
+              className="text-bone/50 hover:text-volt transition-colors uppercase tracking-widest"
+            >
+              TERMS OF SERVICE
+            </Link>
+          </div>
           <span>ALL RIGHTS RESERVED</span>
         </div>
       </div>

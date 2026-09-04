@@ -20,7 +20,7 @@ export default function BottomNav() {
   const pillRef = useRef<HTMLDivElement>(null);
   const setActiveTab = useKinetix((s) => s.setActiveTab);
 
-  // Determine active tab from pathname
+  // Determine active tab from pathname (null if on subpages like /privacy or /terms)
   const activeTabId =
     pathname === "/"
       ? "studio"
@@ -30,7 +30,7 @@ export default function BottomNav() {
       ? "about"
       : pathname.startsWith("/contact")
       ? "contact"
-      : "studio";
+      : null;
 
   useEffect(() => {
     const el = pillRef.current;
@@ -38,9 +38,15 @@ export default function BottomNav() {
     if (!el || !parent) return;
 
     const place = (animate: boolean) => {
-      const active = parent.querySelector<HTMLElement>(`[data-tab="${activeTabId}"]`);
-      if (!active) return;
+      const active = activeTabId
+        ? parent.querySelector<HTMLElement>(`[data-tab="${activeTabId}"]`)
+        : null;
+      if (!active) {
+        gsap.to(el, { opacity: 0, duration: 0.25, overwrite: true });
+        return;
+      }
       gsap.to(el, {
+        opacity: 1,
         x: active.offsetLeft,
         width: active.offsetWidth,
         duration: animate ? 0.45 : 0,

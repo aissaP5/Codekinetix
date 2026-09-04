@@ -13,12 +13,12 @@ import ProjectTransition from "@/components/project/ProjectTransition";
 import PageTransition, { navigateWithTransition } from "@/components/portfolio/PageTransition";
 import CustomCursor from "@/components/portfolio/CustomCursor";
 
-function getTabFromPath(path: string): TabId {
+function getTabFromPath(path: string): TabId | null {
   if (path === "/") return "studio";
   if (path.startsWith("/works")) return "works";
   if (path.startsWith("/about")) return "about";
   if (path.startsWith("/contact")) return "contact";
-  return "studio";
+  return null;
 }
 
 function RouteTransitionContainer({
@@ -40,8 +40,10 @@ function RouteTransitionContainer({
   useEffect(() => {
     if (pathname !== prevPathnameRef.current) {
       prevPathnameRef.current = pathname;
-      setActiveTab(targetTab);
-      setContentTab(targetTab);
+      if (targetTab) {
+        setActiveTab(targetTab);
+        setContentTab(targetTab);
+      }
       scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
       const t = setTimeout(() => {
         ScrollTrigger.refresh();
@@ -91,6 +93,11 @@ export default function PortfolioShell({
     const cleanCurrent = pathname.split("?")[0].split("#")[0];
     if (cleanHref === cleanCurrent && !href.includes("?")) {
       e.preventDefault();
+      return;
+    }
+
+    // Bypass full-screen curtain transition for utility / legal pages so they navigate immediately
+    if (cleanHref.startsWith("/privacy") || cleanHref.startsWith("/terms")) {
       return;
     }
 

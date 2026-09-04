@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { sendInquiry } from "@/lib/email";
 
 const PROJECT_TYPES = [
@@ -237,6 +238,26 @@ export default function ProjectForm() {
           >
             {feedback}
           </div>
+        )}
+
+        {step === 2 && (
+          <p className="mt-4 font-mono text-[10px] text-bone/45 leading-relaxed">
+            By submitting, you agree to our{" "}
+            <Link
+              href="/terms"
+              className="text-bone/70 hover:text-volt underline underline-offset-2 transition-colors"
+            >
+              Terms of Service
+            </Link>{" "}
+            and acknowledge our{" "}
+            <Link
+              href="/privacy"
+              className="text-bone/70 hover:text-volt underline underline-offset-2 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
         )}
 
         {/* Navigation Buttons */}
