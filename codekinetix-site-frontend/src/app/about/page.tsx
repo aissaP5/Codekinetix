@@ -81,13 +81,15 @@ export default function AboutPage() {
         }
       );
 
-      // Manifesto animation matching video: BUILD tilts -5deg and scrolls up, BREAK enters from below then tilts and scrolls up, SHIP enters from below
+      // Manifesto animation: buttery smooth transition with responsive scrub & opacity fades
       const slides = gsap.utils.toArray<HTMLElement>(".manifesto-slide");
       const counter = root.querySelector<HTMLElement>(".m-count");
 
-      gsap.set(slides[0], { yPercent: 0, rotation: 0 });
-      gsap.set(slides[1], { yPercent: 130, rotation: 0 });
-      gsap.set(slides[2], { yPercent: 130, rotation: 0 });
+      gsap.set(slides[0], { yPercent: 0, opacity: 1 });
+      gsap.set(slides[1], { yPercent: 100, opacity: 0 });
+      gsap.set(slides[2], { yPercent: 100, opacity: 0 });
+
+      const isMobile = window.innerWidth < 768;
 
       const mtl = gsap.timeline({
         scrollTrigger: {
@@ -95,7 +97,7 @@ export default function AboutPage() {
           scroller: scrollerEl,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.5,
+          scrub: isMobile ? 0.2 : 0.45,
           anticipatePin: 1,
           fastScrollEnd: true,
           onUpdate: (self) => {
@@ -108,14 +110,14 @@ export default function AboutPage() {
       });
 
       mtl
-        // BUILD scrolls up and tilts
-        .to(slides[0], { yPercent: -130, rotation: -5, duration: 0.38, ease: "power1.inOut" }, 0.05)
-        // BREAK scrolls up from below into center
-        .to(slides[1], { yPercent: 0, rotation: 0, duration: 0.38, ease: "power1.inOut" }, 0.05)
-        // BREAK scrolls up and tilts
-        .to(slides[1], { yPercent: -130, rotation: -5, duration: 0.38, ease: "power1.inOut" }, 0.52)
-        // SHIP scrolls up from below into center
-        .to(slides[2], { yPercent: 0, rotation: 0, duration: 0.38, ease: "power1.inOut" }, 0.52);
+        // BUILD exits smoothly with fade
+        .to(slides[0], { yPercent: -100, opacity: 0, duration: 0.45, ease: "power2.inOut" }, 0.05)
+        // BREAK enters smoothly from below with fade
+        .fromTo(slides[1], { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.inOut" }, 0.05)
+        // BREAK exits smoothly with fade
+        .to(slides[1], { yPercent: -100, opacity: 0, duration: 0.45, ease: "power2.inOut" }, 0.52)
+        // SHIP enters smoothly from below with fade
+        .fromTo(slides[2], { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.inOut" }, 0.52);
     }, root);
 
     return () => ctx.revert();
@@ -161,17 +163,17 @@ export default function AboutPage() {
           {MANIFESTO.map((m, i) => (
             <div
               key={m.word}
-              className="manifesto-slide absolute inset-0 flex flex-col items-center justify-center gap-4 sm:gap-6 px-4 text-center will-change-transform"
+              className="manifesto-slide absolute inset-0 flex flex-col items-center justify-center gap-3 sm:gap-6 px-4 text-center will-change-transform transform-gpu"
             >
               <span className="font-mono text-xs tracking-[0.4em] text-volt uppercase font-bold">
                 {m.tag}
               </span>
               <h3
-                className={`font-extrabold type-xwide uppercase leading-[0.88] tracking-[-0.02em] text-[27vw] sm:text-[20vw] select-none ${m.cls}`}
+                className={`font-extrabold type-wide sm:type-xwide uppercase leading-[0.88] tracking-[-0.02em] text-[15vw] sm:text-[18vw] lg:text-[15vw] select-none max-w-full px-4 ${m.cls}`}
               >
                 {m.word}
               </h3>
-              <p className="font-mono text-xs sm:text-sm text-bone/70 max-w-md leading-relaxed">
+              <p className="font-mono text-xs sm:text-sm text-bone/70 max-w-md leading-relaxed px-4">
                 {m.desc}
               </p>
             </div>

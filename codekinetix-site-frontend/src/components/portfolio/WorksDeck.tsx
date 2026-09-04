@@ -168,14 +168,17 @@ export default function WorksDeck() {
           }
         });
 
+        const isMobile = window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches;
+
         const stackTl = gsap.timeline({
           scrollTrigger: {
             trigger: wrap,
             scroller: scrollerEl,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.75,
-            fastScrollEnd: true,
+            scrub: isMobile ? 0.15 : 0.45,
+            anticipatePin: 1,
+            fastScrollEnd: false,
             invalidateOnRefresh: true,
           },
         });
@@ -188,9 +191,9 @@ export default function WorksDeck() {
           stackTl.to(
             prevCard,
             {
-              scale: 0.94,
+              scale: isMobile ? 0.96 : 0.94,
               duration: 1,
-              ease: "power2.inOut",
+              ease: "none",
             },
             i - 1
           );
@@ -201,7 +204,7 @@ export default function WorksDeck() {
               {
                 opacity: 0.65,
                 duration: 1,
-                ease: "power2.inOut",
+                ease: "none",
               },
               i - 1
             );
@@ -213,7 +216,7 @@ export default function WorksDeck() {
             {
               yPercent: 0,
               duration: 1,
-              ease: "power2.inOut",
+              ease: "none",
             },
             i - 1
           );

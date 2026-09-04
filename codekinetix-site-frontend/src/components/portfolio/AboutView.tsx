@@ -126,9 +126,11 @@ export default function AboutView() {
       const slides = gsap.utils.toArray<HTMLElement>(".av-m-wrap");
       const counter = root.querySelector<HTMLElement>(".av-m-count");
 
-      gsap.set(slides[0], { yPercent: 0, rotation: 0 });
-      gsap.set(slides[1], { yPercent: 130, rotation: 0 });
-      gsap.set(slides[2], { yPercent: 130, rotation: 0 });
+      gsap.set(slides[0], { yPercent: 0, opacity: 1 });
+      gsap.set(slides[1], { yPercent: 110, opacity: 0 });
+      gsap.set(slides[2], { yPercent: 110, opacity: 0 });
+
+      const isMobile = window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches;
 
       const mtl = gsap.timeline({
         scrollTrigger: {
@@ -136,7 +138,7 @@ export default function AboutView() {
           scroller: scrollerEl,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.5,
+          scrub: isMobile ? 0.2 : 0.45,
           anticipatePin: 1,
           fastScrollEnd: true,
           onUpdate: (self) => {
@@ -146,15 +148,16 @@ export default function AboutView() {
           },
         },
       });
+
       mtl
-        // BUILD moves up and tilts
-        .to(slides[0], { yPercent: -130, rotation: -5, duration: 0.38, ease: "power1.inOut" }, 0.05)
-        // BREAK enters from bottom into center
-        .to(slides[1], { yPercent: 0, rotation: 0, duration: 0.38, ease: "power1.inOut" }, 0.05)
-        // BREAK moves up and tilts
-        .to(slides[1], { yPercent: -130, rotation: -5, duration: 0.38, ease: "power1.inOut" }, 0.52)
-        // SHIP enters from bottom into center
-        .to(slides[2], { yPercent: 0, rotation: 0, duration: 0.38, ease: "power1.inOut" }, 0.52);
+        // BUILD exits up smoothly with fade
+        .to(slides[0], { yPercent: -100, opacity: 0, duration: 0.45, ease: "power2.inOut" }, 0.05)
+        // BREAK enters from bottom into center with fade
+        .fromTo(slides[1], { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.inOut" }, 0.05)
+        // BREAK exits up smoothly with fade
+        .to(slides[1], { yPercent: -100, opacity: 0, duration: 0.45, ease: "power2.inOut" }, 0.52)
+        // SHIP enters from bottom into center with fade
+        .fromTo(slides[2], { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.45, ease: "power2.inOut" }, 0.52);
     }, root);
 
     return () => {
@@ -241,13 +244,13 @@ export default function AboutView() {
           {MANIFESTO.map((m, i) => (
             <div
               key={i}
-              className="av-m-wrap absolute inset-0 flex flex-col items-center justify-center gap-4 sm:gap-6 px-4 text-center will-change-transform"
+              className="av-m-wrap absolute inset-0 flex flex-col items-center justify-center gap-3 sm:gap-6 px-4 text-center will-change-transform transform-gpu"
             >
               <span className="font-mono text-xs tracking-[0.4em] text-volt uppercase font-bold">
                 {m.tag}
               </span>
               <h2
-                className={`av-m-word font-extrabold type-xwide uppercase leading-[0.88] tracking-[-0.02em] text-[27vw] sm:text-[20vw] select-none ${m.cls}`}
+                className={`av-m-word font-extrabold type-wide sm:type-xwide uppercase leading-[0.88] tracking-[-0.02em] text-[15vw] sm:text-[18vw] lg:text-[15vw] select-none max-w-full px-4 ${m.cls}`}
               >
                 {m.word}
               </h2>
