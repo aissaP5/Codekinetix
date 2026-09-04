@@ -51,7 +51,7 @@ export default function ClientsSection() {
   return (
     <section
       ref={rootRef}
-      className="px-4 sm:px-8 py-20 sm:py-28 border-t border-bone/10 bg-void"
+      className="ck-clients-section px-4 sm:px-8 py-20 sm:py-28 border-t border-bone/10 bg-void"
       aria-label="Clients & Industries"
     >
       <div className="max-w-7xl mx-auto">

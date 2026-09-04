@@ -104,7 +104,6 @@ const jsonLd = {
       email: "codekinetixstudio@gmail.com",
       description:
         "Independent digital experience studio building websites, e-commerce, and web applications with design, code, and motion.",
-      foundingDate: "2021",
       areaServed: "Worldwide",
       jobTitle: "Digital Experience Studio",
       knowsAbout: [

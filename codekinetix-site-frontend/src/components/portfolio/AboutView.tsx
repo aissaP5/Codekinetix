@@ -173,7 +173,7 @@ export default function AboutView() {
             <span>
               <span className="text-volt font-bold">01</span> — STUDIO DNA
             </span>
-            <span className="hidden sm:inline">FOUNDED 2021 // GLOBAL CLIENTELE</span>
+            <span className="hidden sm:inline">INDEPENDENT STUDIO // GLOBAL CLIENTELE</span>
             <span>DESIGN × CODE × MOTION</span>
           </div>
 
@@ -223,7 +223,7 @@ export default function AboutView() {
           </div>
           <div className="md:col-span-8 space-y-6 font-mono text-xs sm:text-sm text-bone/70 leading-relaxed">
             <p>
-              CodeKinetix was established in 2021 as an antidote to the cookie-cutter templates, bloated page builders, and impersonal mega-agencies that dominate the web.
+              CodeKinetix was established as an antidote to the cookie-cutter templates, bloated page builders, and impersonal mega-agencies that dominate the web.
             </p>
             <p>
               We operate as a focused creative coding unit. We combine haute-couture typography, brutalist architectural layout grids, and cutting-edge GSAP kinetic motion with robust modern engineering (Next.js, TypeScript, and edge-native architectures).

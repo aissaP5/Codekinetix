@@ -143,7 +143,7 @@ export default function AboutPage() {
           </div>
           <div className="md:col-span-8 space-y-5 text-xs sm:text-sm text-bone/70 leading-relaxed">
             <p>
-              CodeKinetix was created in 2021 as an antidote to cookie-cutter templates, drag-and-drop page builders, and sluggish agency processes.
+              CodeKinetix was created as an antidote to cookie-cutter templates, drag-and-drop page builders, and sluggish agency processes.
             </p>
             <p>
               We operate as a high-velocity creative engineering studio. We combine editorial typography scales, brutalist structural layouts, and fluid GSAP kinetic choreography with modern edge architectures.

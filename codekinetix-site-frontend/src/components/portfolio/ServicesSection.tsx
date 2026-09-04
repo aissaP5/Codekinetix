@@ -36,19 +36,26 @@ export default function ServicesSection() {
     const scrollerEl = root.closest("main") ?? undefined;
 
     const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>(".cap-card").forEach((card) => {
-        gsap.fromTo(
-          card,
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: { trigger: card, scroller: scrollerEl, start: "top 90%", once: true },
-          }
-        );
-      });
+      const cards = gsap.utils.toArray<HTMLElement>(".cap-card", root);
+      if (!cards.length) return;
+
+      gsap.fromTo(
+        cards,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.45,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: root,
+            scroller: scrollerEl,
+            start: "top 82%",
+            once: true,
+          },
+        }
+      );
     }, root);
 
     return () => ctx.revert();

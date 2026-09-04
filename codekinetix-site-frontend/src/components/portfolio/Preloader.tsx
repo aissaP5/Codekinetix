@@ -337,7 +337,7 @@ export default function Preloader() {
       {/* top meta row */}
       <div className="relative flex items-center justify-between font-mono text-[10px] tracking-[0.3em] text-bone/40">
         <span className="pl-meta-l">FREELANCE WEB STUDIO</span>
-        <span className="pl-meta-r">EST. 2021</span>
+        <span className="pl-meta-r">DIGITAL EXPERIENCE STUDIO</span>
       </div>
 
       {/* center — the CK monogram on its calibration stage.

@@ -16,7 +16,16 @@ const LINES: { text: string; cls: string }[] = [
   { text: "WE BUILD",         cls: "text-bone" },
   { text: "DIGITAL",          cls: "text-stroke-bone text-transparent" },
   { text: "EXPERIENCES",      cls: "text-volt drop-shadow-[0_0_24px_rgba(58,111,255,0.45)]" },
-  { text: "PEOPLE REMEMBER.", cls: "text-bone/45" },
+  { text: "PEOPLE",           cls: "text-bone/45" },
+  { text: "REMEMBER.",        cls: "text-bone/45" },
+];
+
+const MOBILE_LINES: { text: string; cls: string }[] = [
+  { text: "WE BUILD",         cls: "text-bone" },
+  { text: "DIGITAL",          cls: "text-stroke-bone text-transparent" },
+  { text: "EXPERIENCES",      cls: "text-volt drop-shadow-[0_0_24px_rgba(58,111,255,0.45)]" },
+  { text: "PEOPLE",           cls: "text-bone/45" },
+  { text: "REMEMBER.",        cls: "text-bone/45" },
 ];
 
 interface Particle {
@@ -26,15 +35,27 @@ interface Particle {
   hy: number;
   vx: number;
   vy: number;
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-  size: number;
-  phase: number;
-  freq: number;
   amp: number;
+  phase: number;
   specular: boolean;
+  // Pre-computed constants for zero-lag 120 FPS math:
+  dist: number;
+  cosAngle: number;
+  sinAngle: number;
+  k1: number;
+  k2: number;
+  kBreathe: number;
+  kSwirl: number;
+  kDriftX: number;
+  kDriftY: number;
+  ampA: number;
+  ampB: number;
+  // Direct sprite reference & layout offsets (eliminates Map lookups and divisions in render)
+  sprite: HTMLCanvasElement;
+  hw: number;
+  hh: number;
+  sw: number;
+  sh: number;
 }
 
 interface Ripple {
@@ -69,31 +90,40 @@ export default function HeroSection() {
   const ctaRef    = useRef<HTMLAnchorElement>(null);
 
   /* ──────────────────────────────────────────────────────────
-     1. HIGH-PERFORMANCE PARTICLE LOGO ENGINE (ZERO MOBILE LAG)
+     1. HIGH-PERFORMANCE PARTICLE LOGO ENGINE (ZERO LOW-END LAG)
      ────────────────────────────────────────────────────────── */
   useEffect(() => {
     const canvas = canvasRef.current;
     const stage  = stageRef.current;
     if (!canvas || !stage) return;
 
-    // Skip particle engine entirely on mobile — canvas is hidden by CSS
-    // and running it wastes CPU, memory, and battery on phones
+    // Skip particle engine entirely on small mobile screens where canvas is hidden
     const isMobileViewport = () => window.innerWidth < 640;
     if (isMobileViewport()) return;
 
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let animId: number;
+    let animId = 0;
+    let isIntersecting = true;
     let W = 0;
     let H = 0;
 
     const checkMobile = () =>
       window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches;
 
+    const checkLowEnd = () => {
+      if (typeof navigator === "undefined") return false;
+      const cores = navigator.hardwareConcurrency || 4;
+      const memory = (navigator as unknown as { deviceMemory?: number }).deviceMemory || 8;
+      return cores <= 4 || memory <= 4;
+    };
+
     let isMobile = checkMobile();
-    // Cap DPR to 1.5 on mobile to avoid fill-rate bottleneck; 2 on desktop
-    let dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+    const isLowEnd = checkLowEnd();
+
+    // Cap DPR to 1.25 on low-end/mobile to eliminate fill-rate bottlenecks; 1.6 on desktop
+    let dpr = isLowEnd ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(window.devicePixelRatio || 1, 1.6);
 
     const pointer = {
       x: -9999,
@@ -105,6 +135,43 @@ export default function HeroSection() {
     const ripples: Ripple[] = [];
     let particles: Particle[] = [];
     let isMounted = true;
+
+    /* Sprite cache for offscreen particle textures */
+    const spriteCache = new Map<string, HTMLCanvasElement>();
+
+    const getSprite = (r: number, g: number, b: number, a: number, size: number): HTMLCanvasElement => {
+      const key = `${r},${g},${b},${(a * 100) | 0},${(size * 10) | 0}`;
+      let cached = spriteCache.get(key);
+      if (cached) return cached;
+
+      const s = Math.ceil(size * 2 * dpr) + 2;
+      const off = document.createElement("canvas");
+      off.width = s;
+      off.height = s;
+      const octx = off.getContext("2d")!;
+      octx.beginPath();
+      octx.arc(s / 2, s / 2, size * dpr, 0, Math.PI * 2);
+      octx.fillStyle = `rgba(${r},${g},${b},${a * 0.95})`;
+      octx.fill();
+      spriteCache.set(key, off);
+      return off;
+    };
+
+    let specularSprite: HTMLCanvasElement;
+    const buildSpecularSprite = () => {
+      const baseSize = isMobile ? 2.5 : 2.2;
+      const s = Math.ceil(baseSize * 2 * dpr) + 2;
+      const off = document.createElement("canvas");
+      off.width = s;
+      off.height = s;
+      const octx = off.getContext("2d")!;
+      octx.beginPath();
+      octx.arc(s / 2, s / 2, baseSize * dpr, 0, Math.PI * 2);
+      octx.fillStyle = "#ffffff";
+      octx.fill();
+      specularSprite = off;
+    };
+    buildSpecularSprite();
 
     /* Sample logo image and extract normalized coordinates */
     const sampleLogoAsset = async (): Promise<RawHit[]> => {
@@ -188,8 +255,11 @@ export default function HeroSection() {
       if (!canvas || !stage || !isMounted || rawHits.length === 0) return;
 
       isMobile = checkMobile();
-      dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+      dpr = isLowEnd ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(window.devicePixelRatio || 1, 1.6);
       pointer.radius = isMobile ? 95 : 135;
+
+      spriteCache.clear();
+      buildSpecularSprite();
 
       const rect = stage.getBoundingClientRect();
       W = rect.width;
@@ -201,8 +271,8 @@ export default function HeroSection() {
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Adaptive particle budget: ~900 on mobile for 60fps; 2400 on desktop
-      const targetCount = isMobile ? 900 : 2400;
+      // Adaptive particle budget: ~800 mobile, ~1400 low-end PC, ~2500 high-end desktop
+      const targetCount = isMobile ? 800 : isLowEnd ? 1400 : 2500;
       const step = Math.max(1, rawHits.length / targetCount);
 
       const sampled: RawHit[] = [];
@@ -210,8 +280,12 @@ export default function HeroSection() {
         sampled.push(rawHits[Math.floor(i)]);
       }
 
-      // Logo sizing: fill the stage generously, extra scale on mobile for visual impact
-      const logoScale = Math.min(W * (isMobile ? 0.82 : 0.76), H * (isMobile ? 0.78 : 0.66), isMobile ? 380 : 460);
+      // Logo sizing: generous presence and monumental scale
+      const logoScale = Math.min(
+        W * (isMobile ? 0.86 : 0.82),
+        H * (isMobile ? 0.84 : 0.74),
+        isMobile ? 420 : 540
+      );
       const centerX = W / 2;
       const centerY = H / 2;
 
@@ -224,67 +298,54 @@ export default function HeroSection() {
         const boostG = Math.min(255, Math.round(pt.g * 1.5 + 75));
         const boostB = Math.min(255, Math.round(pt.b * 1.2 + 95));
 
+        const pSize = pt.specular ? (isMobile ? 3.4 : 2.4) : (isMobile ? 2.6 : 1.7);
+        const phase = Math.random() * Math.PI * 2;
+        const amp = isMobile ? 2.8 + Math.random() * 2.8 : 4.5 + Math.random() * 4.5;
+
+        // Precompute constants to completely eliminate trigonometric and geometric math in the render loop
+        const cdx = hx - centerX;
+        const cdy = hy - centerY;
+        const dist = Math.hypot(cdx, cdy);
+        const angle = Math.atan2(cdy, cdx);
+        const cosAngle = Math.cos(angle);
+        const sinAngle = Math.sin(angle);
+
+        const sprite = pt.specular ? specularSprite : getSprite(boostR, boostG, boostB, pt.a, pSize);
+
         return {
-          x: hx + (Math.random() - 0.5) * 6,
-          y: hy + (Math.random() - 0.5) * 6,
+          x: hx + (Math.random() - 0.5) * 8,
+          y: hy + (Math.random() - 0.5) * 8,
           hx,
           hy,
-          vx: 0,
-          vy: 0,
-          r: boostR,
-          g: boostG,
-          b: boostB,
-          a: pt.a,
-          size: pt.specular ? (isMobile ? 3.2 : 2.2) : (isMobile ? 2.5 : 1.6),
-          phase: Math.random() * Math.PI * 2,
-          freq: 0.0014 + Math.random() * 0.0016,
-          amp: isMobile ? 0.8 + Math.random() * 1.2 : 1.2 + Math.random() * 2.0,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          amp,
+          phase,
           specular: pt.specular,
+          dist,
+          cosAngle,
+          sinAngle,
+          k1: (hx * 0.018 - hy * 0.014) + phase,
+          k2: (hx * 0.014 + hy * 0.018) + phase * 0.8,
+          kBreathe: -dist * 0.016 + phase * 0.5,
+          kSwirl: dist * 0.01 + phase,
+          kDriftX: hy * 0.015 + phase,
+          kDriftY: hx * 0.015 + phase,
+          ampA: amp * 0.85,
+          ampB: amp * 0.72,
+          sprite,
+          hw: sprite.width / (2 * dpr),
+          hh: sprite.height / (2 * dpr),
+          sw: sprite.width / dpr,
+          sh: sprite.height / dpr,
         };
       });
     };
 
-    /* High-Performance Render Loop — Sprite-Batched for 120 FPS */
-    // Pre-render particle circle sprites on offscreen canvases
-    const spriteCache = new Map<string, HTMLCanvasElement>();
-
-    const getSprite = (r: number, g: number, b: number, a: number, size: number): HTMLCanvasElement => {
-      const key = `${r},${g},${b},${(a * 100) | 0},${(size * 10) | 0}`;
-      let cached = spriteCache.get(key);
-      if (cached) return cached;
-
-      const s = Math.ceil(size * 2 * dpr) + 2;
-      const off = document.createElement("canvas");
-      off.width = s;
-      off.height = s;
-      const octx = off.getContext("2d")!;
-      octx.beginPath();
-      octx.arc(s / 2, s / 2, size * dpr, 0, Math.PI * 2);
-      octx.fillStyle = `rgba(${r},${g},${b},${a * 0.95})`;
-      octx.fill();
-      spriteCache.set(key, off);
-      return off;
-    };
-
-    // Build specular (white) sprite
-    const specularSprite = (() => {
-      const baseSize = isMobile ? 2.5 : 2.2;
-      const s = Math.ceil(baseSize * 2 * dpr) + 2;
-      const off = document.createElement("canvas");
-      off.width = s;
-      off.height = s;
-      const octx = off.getContext("2d")!;
-      octx.beginPath();
-      octx.arc(s / 2, s / 2, baseSize * dpr, 0, Math.PI * 2);
-      octx.fillStyle = "#ffffff";
-      octx.fill();
-      return off;
-    })();
-
+    /* Zero-Lag Render Loop — Fully Precomputed Constants & Zero Heap Allocations */
     const render = (time: number) => {
       if (!isMounted) return;
-      // Pause rendering when tab/page is hidden to save battery & CPU
-      if (document.hidden) {
+      if (document.hidden || !isIntersecting) {
         animId = 0;
         return;
       }
@@ -301,34 +362,61 @@ export default function HeroSection() {
 
       const pLen = particles.length;
       const springK = isMobile ? 0.052 : 0.045;
-      const dampK   = isMobile ? 0.87 : 0.885;
+      const dampK   = isMobile ? 0.88 : 0.895;
       const rCount  = ripples.length;
+      const tSec    = time * 0.001;
+      const t22 = tSec * 2.2;
+      const t18 = tSec * 1.8;
+      const t16 = tSec * 1.6;
+      const t12 = tSec * 1.2;
+      const t15 = tSec * 1.5;
+      const t13 = tSec * 1.3;
+
+      const breatheBase = isMobile ? 2.4 : 4.0;
+      const swirlBase = isMobile ? 2.0 : 3.2;
+      const r2 = pointer.radius * pointer.radius;
+      const pForce = isMobile ? 6.8 : 8.6;
 
       for (let i = 0; i < pLen; i++) {
         const p = particles[i];
 
-        // 1. Spring force to home position
-        const dx = p.hx - p.x;
-        const dy = p.hy - p.y;
-        p.vx += dx * springK;
-        p.vy += dy * springK;
+        // 1. Idle continuous forces: multi-frequency harmonic fluid waves (pure arithmetic)
+        const waveA = Math.sin(t22 + p.k1) * p.ampA;
+        const waveB = Math.cos(t18 + p.k2) * p.ampB;
 
-        // 2. Pointer repulsion
+        // Wave B: radial breathing pulse undulating outwards from center
+        const breathe = Math.sin(t16 + p.kBreathe) * breatheBase;
+        const breathX = p.cosAngle * breathe;
+        const breathY = p.sinAngle * breathe;
+
+        // Wave C: gentle organic vortex swirl
+        const swirl = Math.sin(t12 + p.kSwirl) * swirlBase;
+        const swirlX = -p.sinAngle * swirl;
+        const swirlY = p.cosAngle * swirl;
+
+        // Idle drift physics force injected into velocity for organic inertia
+        p.vx += Math.sin(t15 + p.kDriftX) * 0.18;
+        p.vy += Math.cos(t13 + p.kDriftY) * 0.18;
+
+        // 2. Spring force to home position
+        p.vx += (p.hx - p.x) * springK;
+        p.vy += (p.hy - p.y) * springK;
+
+        // 3. Pointer repulsion (interactive hover reaction)
         if (pointer.active) {
           const pdx = p.x - pointer.x;
           const pdy = p.y - pointer.y;
           const dist2 = pdx * pdx + pdy * pdy;
-          const r2 = pointer.radius * pointer.radius;
 
           if (dist2 < r2 && dist2 > 1) {
             const dist = Math.sqrt(dist2);
-            const force = (1 - dist / pointer.radius) * (isMobile ? 6.5 : 7.8);
+            const force = (1 - dist / pointer.radius) * pForce;
             p.vx += (pdx / dist) * force;
             p.vy += (pdy / dist) * force;
           }
         }
 
-        // 3. Shockwave impulse
+        // 4. Shockwave impulse
         for (let rIdx = 0; rIdx < rCount; rIdx++) {
           const rp = ripples[rIdx];
           const rdx = p.x - rp.x;
@@ -343,25 +431,21 @@ export default function HeroSection() {
           }
         }
 
-        // 4. Damping & Position Update
+        // 5. Damping & Position Update
         p.vx *= dampK;
         p.vy *= dampK;
 
         p.x += p.vx;
         p.y += p.vy;
 
-        // 5. Ambient micro-wandering (gentle breathing)
-        const wanderX = Math.cos(time * p.freq + p.phase) * p.amp;
-        const wanderY = Math.sin(time * p.freq * 1.3 + p.phase) * (p.amp * 0.7);
-
-        const drawX = p.x + wanderX;
-        const drawY = p.y + wanderY;
-
-        // 6. Sprite-batched draw — single drawImage per particle (< 0.5ms total)
-        const sprite = p.specular ? specularSprite : getSprite(p.r, p.g, p.b, p.a, p.size);
-        const hw = sprite.width / (2 * dpr);
-        const hh = sprite.height / (2 * dpr);
-        ctx.drawImage(sprite, drawX - hw, drawY - hh, sprite.width / dpr, sprite.height / dpr);
+        // 6. Sprite-batched draw: direct pointer access, zero calculations in draw call
+        ctx.drawImage(
+          p.sprite,
+          p.x + waveA + breathX + swirlX - p.hw,
+          p.y + waveB + breathY + swirlY - p.hh,
+          p.sw,
+          p.sh
+        );
       }
 
       animId = requestAnimationFrame(render);
@@ -371,7 +455,9 @@ export default function HeroSection() {
     sampleLogoAsset().then((hits) => {
       if (!isMounted || hits.length === 0) return;
       buildParticles(hits);
-      animId = requestAnimationFrame(render);
+      if (isIntersecting && !document.hidden) {
+        animId = requestAnimationFrame(render);
+      }
     });
 
     const updatePointerPos = (clientX: number, clientY: number) => {
@@ -417,10 +503,35 @@ export default function HeroSection() {
     stage.addEventListener("pointerdown", handlePointerDown, { passive: true });
     window.addEventListener("resize", handleResize);
 
+    // IntersectionObserver: PAUSE rAF loop completely when hero scrolls out of view
+    // Immediately releases 100% of canvas CPU & GPU workload during site scroll
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          isIntersecting = entry.isIntersecting;
+          if (!isIntersecting) {
+            if (animId) {
+              cancelAnimationFrame(animId);
+              animId = 0;
+            }
+          } else {
+            if (!animId && !document.hidden && isMounted && particles.length > 0) {
+              animId = requestAnimationFrame(render);
+            }
+          }
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(stage);
+
     // Pause rAF loop when tab is hidden; resume when visible again
     const handleVisibilityChange = () => {
-      if (!document.hidden && !animId && isMounted && particles.length > 0) {
+      if (!document.hidden && isIntersecting && !animId && isMounted && particles.length > 0) {
         animId = requestAnimationFrame(render);
+      } else if (document.hidden && animId) {
+        cancelAnimationFrame(animId);
+        animId = 0;
       }
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -428,7 +539,8 @@ export default function HeroSection() {
     return () => {
       isMounted = false;
       clearTimeout(resizeTimer);
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
+      observer.disconnect();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       stage.removeEventListener("pointermove", handlePointerMove);
       stage.removeEventListener("pointerleave", handlePointerLeave);
@@ -588,7 +700,7 @@ export default function HeroSection() {
   return (
     <section
       ref={rootRef}
-      className="relative w-full min-h-[calc(100dvh-72px)] overflow-hidden flex flex-col justify-between bg-void isolate select-none"
+      className="relative w-full min-h-auto sm:min-h-[calc(100dvh-40px)] lg:min-h-dvh overflow-hidden flex flex-col justify-between bg-void isolate select-none border-b border-bone/10"
       aria-label="CodeKinetix Hero"
       style={{
         background: `
@@ -617,64 +729,54 @@ export default function HeroSection() {
       <div className="noise-overlay absolute inset-0 z-40 pointer-events-none opacity-[0.035]" aria-hidden="true" />
 
       {/* ─────────────────────────────────────────────────────────
-          MOBILE HERO (< sm) — full-bleed type layout, no canvas
+          MOBILE HERO (< sm) — cohesive editorial layout, no empty voids
           ───────────────────────────────────────────────────────── */}
-      <div className="sm:hidden relative z-10 flex flex-col flex-1 px-5 pt-8 pb-6 justify-between">
+      <div className="sm:hidden relative z-10 flex flex-col px-5 pt-6 pb-8">
         {/* Mobile top label */}
-        <div className="flex items-center justify-between font-mono text-[9px] tracking-[0.28em] uppercase text-bone/40 mb-8">
+        <div className="flex items-center justify-between font-mono text-[9px] tracking-[0.22em] uppercase text-bone/40 pb-4 mb-6 border-b border-bone/10">
           <span><span className="text-volt font-bold">●</span> CODEKINETIX®</span>
-          <span>EST. 2021</span>
+          <span>DIGITAL EXPERIENCE STUDIO</span>
         </div>
 
-        {/* Mobile headline — fills width */}
-        <div className="flex-1 flex flex-col justify-center">
-          <h1
-            className="font-extrabold type-xwide uppercase leading-[0.88] tracking-[-0.02em] text-bone mb-6"
-            style={{ fontSize: "clamp(38px, 13vw, 56px)" }}
-            aria-label="We build digital experiences people remember."
-          >
-            {LINES.map((line, li) => (
-              <span key={li} className="block overflow-hidden py-0.5">
-                <span className={`h-ln block ${line.cls}`}>
-                  {line.text.split("").map((ch, ci) => (
-                    <span key={ci} className="h-ch inline-block" data-char={ch}>
-                      {ch === " " ? "\u00A0" : ch}
-                    </span>
-                  ))}
-                </span>
+        {/* Mobile headline */}
+        <h1
+          className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.03em] text-bone mb-5"
+          style={{ fontSize: "clamp(30px, 9.4vw, 44px)" }}
+          aria-label="We build digital experiences people remember."
+        >
+          {MOBILE_LINES.map((line, li) => (
+            <span key={li} className="block overflow-hidden py-0.5">
+              <span className={`h-ln block ${line.cls}`}>
+                {line.text.split("").map((ch, ci) => (
+                  <span key={ci} className="h-ch inline-block" data-char={ch}>
+                    {ch === " " ? "\u00A0" : ch}
+                  </span>
+                ))}
               </span>
-            ))}
-          </h1>
+            </span>
+          ))}
+        </h1>
 
-          {/* Volt accent divider */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-px flex-1 bg-volt/30" />
-            <span className="font-mono text-[9px] tracking-[0.3em] text-volt uppercase">DESIGN × CODE × MOTION</span>
-            <div className="h-px w-6 bg-volt/30" />
-          </div>
-
-          {/* Description */}
-          <p className="h-desc font-serif italic text-[14px] leading-[1.65] text-bone/60 mb-8 max-w-[340px]">
-            Bespoke digital experiences engineered from raw code — not templates.
-          </p>
-
-          {/* Stat chips row */}
-          <div className="flex items-center gap-2 mb-8 flex-wrap">
-            {[["100%", "CUSTOM CODE"], ["60fps", "ANIMATIONS"], ["24H", "RESPONSE"]].map(([val, lbl]) => (
-              <div key={lbl} className="flex flex-col items-center px-3 py-2 border border-bone/10 bg-void/60 backdrop-blur-sm">
-                <span className="font-extrabold type-xwide text-volt text-sm leading-none">{val}</span>
-                <span className="font-mono text-[7px] tracking-[0.2em] text-bone/40 mt-0.5">{lbl}</span>
-              </div>
-            ))}
-          </div>
+        {/* Perfectly centered Volt accent divider with balanced equal-length wings */}
+        <div className="flex items-center justify-center gap-3 my-5 w-full">
+          <div className="h-px flex-1 bg-volt/30" />
+          <span className="font-mono text-[9px] tracking-[0.25em] text-volt uppercase shrink-0">
+            DESIGN × CODE × MOTION
+          </span>
+          <div className="h-px flex-1 bg-volt/30" />
         </div>
 
-        {/* Mobile CTAs */}
+        {/* Description */}
+        <p className="h-desc font-serif italic text-[15px] leading-[1.65] text-bone/65 mb-7 max-w-[360px]">
+          Bespoke digital experiences engineered from raw code — not templates.
+        </p>
+
+        {/* Mobile CTAs — tight, cohesive rhythm */}
         <div className="h-act flex flex-col gap-3">
           <Link
             ref={ctaRef}
             href="/contact"
-            className="group relative inline-flex items-center justify-center gap-3 h-[50px] overflow-hidden border border-bone text-void font-mono text-[10px] font-extrabold tracking-[0.18em] uppercase bg-bone transition-all duration-300"
+            className="group relative inline-flex items-center justify-center gap-3 h-[52px] overflow-hidden border border-bone text-void font-mono text-[10px] font-extrabold tracking-[0.18em] uppercase bg-bone transition-all duration-300"
           >
             <span className="absolute inset-0 bg-volt translate-y-full group-hover:translate-y-0 transition-transform duration-[450ms] ease-[cubic-bezier(.16,1,.3,1)]" />
             <span className="relative z-[2] group-hover:text-bone transition-colors duration-300">START A PROJECT</span>
@@ -682,14 +784,14 @@ export default function HeroSection() {
           </Link>
           <Link
             href="/works"
-            className="inline-flex items-center justify-center gap-3 h-[46px] font-mono text-[10px] tracking-[0.18em] uppercase border border-bone/15 text-bone/60"
+            className="inline-flex items-center justify-center gap-3 h-[48px] font-mono text-[10px] tracking-[0.18em] uppercase border border-bone/15 text-bone/60"
           >
             VIEW WORKS <span>↓</span>
           </Link>
         </div>
 
         {/* Mobile scroll cue */}
-        <div className="mt-6 flex items-center justify-center gap-2 font-mono text-[8px] tracking-[0.25em] uppercase text-bone/30">
+        <div className="mt-8 flex items-center justify-center gap-2 font-mono text-[8px] tracking-[0.25em] uppercase text-bone/30">
           <span className="w-4 h-px bg-bone/20" />
           SCROLL TO EXPLORE
           <span className="w-4 h-px bg-bone/20" />
@@ -697,21 +799,21 @@ export default function HeroSection() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────
-          DESKTOP HERO (sm+) — split layout with particle logo
+          DESKTOP HERO (sm+) — split layout with enlarged scale
           ───────────────────────────────────────────────────────── */}
-      <div className="hidden sm:flex relative z-10 w-full max-w-[1720px] mx-auto flex-1 flex-col lg:flex-row items-center justify-between px-12 lg:px-16 pt-10 pb-10 gap-8 lg:gap-8">
+      <div className="hidden sm:flex relative z-10 w-full max-w-[1760px] mx-auto flex-1 flex-col lg:flex-row items-center justify-between px-8 md:px-12 lg:px-16 xl:px-20 pt-16 md:pt-20 lg:pt-24 pb-14 md:pb-18 lg:pb-20 gap-10 lg:gap-14">
 
         {/* ─── LEFT COLUMN: HERO COPY ─── */}
-        <div className="w-full lg:w-[48%] xl:w-[46%] flex flex-col justify-center order-1 lg:order-1 text-left">
+        <div className="w-full lg:w-[50%] xl:w-[48%] flex flex-col justify-center order-1 lg:order-1 text-left">
 
-          {/* Scramble Headline */}
+          {/* Scramble Headline — Enlarged monumental display */}
           <h1
-            className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.05em]"
-            style={{ fontSize: "clamp(32px, 5vw, 62px)" }}
+            className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.04em]"
+            style={{ fontSize: "clamp(30px, 4.4vw, 64px)" }}
             aria-label="We build digital experiences people remember."
           >
             {LINES.map((line, li) => (
-              <span key={li} className="block overflow-hidden pl-2 py-0.5">
+              <span key={li} className="block overflow-hidden pl-1 sm:pl-2 py-0.5">
                 <span className={`h-ln block whitespace-nowrap ${line.cls}`}>
                   {line.text.split("").map((ch, ci) => (
                     <span key={ci} className="h-ch inline-block" data-char={ch}>
@@ -724,18 +826,18 @@ export default function HeroSection() {
           </h1>
 
           {/* Editorial Description */}
-          <p className="h-desc max-w-[480px] mt-6 font-serif italic text-[16px] leading-[1.6] text-bone/65 pl-1">
+          <p className="h-desc max-w-[540px] mt-8 font-serif italic text-[17px] sm:text-[18px] leading-[1.65] text-bone/65 pl-1">
             <strong className="text-bone font-medium not-italic">Design × Code × Motion</strong>{" "}
             engineered into bespoke digital experiences built from raw code — not templates.
           </p>
 
           {/* CTA Actions */}
-          <div className="h-act flex flex-row items-center gap-4 mt-8 pl-1">
+          <div className="h-act flex flex-row items-center gap-4 mt-9 pl-1">
             {/* Primary CTA */}
             <Link
               ref={ctaRef}
               href="/contact"
-              className="group relative inline-flex items-center justify-center gap-3 h-[52px] px-7 overflow-hidden border border-bone text-void font-mono text-[10px] font-extrabold tracking-[0.18em] uppercase cursor-pointer bg-bone transition-all duration-300"
+              className="group relative inline-flex items-center justify-center gap-3 h-[54px] px-8 overflow-hidden border border-bone text-void font-mono text-[11px] font-extrabold tracking-[0.18em] uppercase cursor-pointer bg-bone transition-all duration-300"
             >
               <span className="absolute inset-0 bg-volt translate-y-full group-hover:translate-y-0 transition-transform duration-[450ms] ease-[cubic-bezier(.16,1,.3,1)]" />
               <span className="relative z-[2] group-hover:text-bone transition-colors duration-300">
@@ -749,7 +851,7 @@ export default function HeroSection() {
             {/* Secondary CTA */}
             <Link
               href="/works"
-              className="inline-flex items-center justify-center gap-3 h-[52px] px-6 font-mono text-[10px] tracking-[0.18em] uppercase border border-bone/20 text-bone/70 hover:border-volt hover:text-volt transition-all duration-300"
+              className="inline-flex items-center justify-center gap-3 h-[54px] px-7 font-mono text-[11px] tracking-[0.18em] uppercase border border-bone/20 text-bone/70 hover:border-volt hover:text-volt transition-all duration-300"
             >
               VIEW WORKS <span>↓</span>
             </Link>
@@ -760,14 +862,14 @@ export default function HeroSection() {
         <div className="h-stage-wrap w-full lg:w-[52%] xl:w-[54%] flex items-center justify-center order-2 lg:order-2">
           <div
             ref={stageRef}
-            className="relative w-full max-w-[480px] lg:max-w-[660px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
+            className="relative w-full max-w-[540px] lg:max-w-[740px] xl:max-w-[820px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
             style={{ perspective: "1000px" }}
           >
             {/* Ambient Radial Volt Halo */}
             <div
-              className="absolute inset-[4%] rounded-full blur-[55px] pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity duration-700"
+              className="absolute inset-[2%] rounded-full blur-[60px] pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity duration-700"
               style={{
-                background: `radial-gradient(circle, rgba(${VOLT_RGB},0.36), rgba(${VOLT_RGB},0.10) 50%, transparent 78%)`,
+                background: `radial-gradient(circle, rgba(${VOLT_RGB},0.38), rgba(${VOLT_RGB},0.12) 50%, transparent 78%)`,
               }}
               aria-hidden="true"
             />
@@ -818,7 +920,7 @@ export default function HeroSection() {
           ═══════════════════════════════════════════════════════ */}
       <div className="h-edge relative z-10 w-full max-w-[1720px] mx-auto px-10 lg:px-16 pb-8 pt-3 border-t border-bone/10 hidden sm:flex items-center justify-between font-mono text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-bone/40">
         <div>
-          EST. 2021 · CODEKINETIX®
+          DIGITAL EXPERIENCE STUDIO · CODEKINETIX®
         </div>
 
         <div className="flex items-center gap-3">

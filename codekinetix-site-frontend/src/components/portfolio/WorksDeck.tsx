@@ -41,7 +41,10 @@ function ProjectCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform select-none"
-      style={{ zIndex: index + 1 }}
+      style={{
+        zIndex: index + 1,
+        opacity: index > 0 ? 0 : 1,
+      }}
     >
       {/* ── FULL-BLEED SCREENSHOT ── */}
       <picture>
@@ -66,7 +69,7 @@ function ProjectCard({
           loop
           playsInline
           preload="none"
-          className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500 opacity-0 group-hover:opacity-100 pointer-events-none z-0"
+          className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500 opacity-0 group-hover:opacity-100 pointer-events-none z-0 hidden sm:block"
         />
       )}
 
@@ -158,10 +161,10 @@ export default function WorksDeck() {
         const cards = gsap.utils.toArray<HTMLElement>(".wv-card", root);
         if (!cards.length) return;
 
-        // Set initial positions: all cards after card 0 start below viewport
+        // Set initial positions: cards after index 0 start below viewport with opacity restored
         cards.forEach((card, i) => {
           if (i > 0) {
-            gsap.set(card, { yPercent: 100 });
+            gsap.set(card, { yPercent: 100, opacity: 1 });
           }
         });
 
@@ -260,12 +263,12 @@ export default function WorksDeck() {
       }, root);
     };
 
+    init();
+
     if (curtain.isCovered()) {
       curtain.whenUncovered().then(() => {
-        if (alive) init();
+        if (alive) ScrollTrigger.refresh();
       });
-    } else {
-      init();
     }
 
     return () => {

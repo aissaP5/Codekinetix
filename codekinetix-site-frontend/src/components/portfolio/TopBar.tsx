@@ -9,7 +9,6 @@ import { useKinetix, type TabId } from "@/lib/store";
 const NAV_LINKS = [
   { href: "/works", label: "WORKS", id: "works" as TabId },
   { href: "/about", label: "ABOUT", id: "about" as TabId },
-  { href: "/career", label: "CAREER", id: "about" as TabId },
 ];
 
 export default function TopBar() {
@@ -236,7 +235,7 @@ export default function TopBar() {
 
         <div className="pt-6 border-t border-bone/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-[10px] text-ash">
           <span>INDEPENDENT DIGITAL EXPERIENCE STUDIO</span>
-          <span>AVAILABLE FOR PROJECTS — 2026</span>
+          <span>AVAILABLE FOR NEW PROJECTS</span>
         </div>
       </div>
     </>

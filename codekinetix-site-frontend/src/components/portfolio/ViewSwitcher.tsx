@@ -13,7 +13,6 @@ import AboutView from "./AboutView";
    swap itself lands under the ~2.3s transition cover regardless).
    AboutView stays static — it IS the first paint. */
 const WorksView = dynamic(() => import("./WorksView"), { ssr: false });
-const CareerView = dynamic(() => import("./CareerView"), { ssr: false });
 
 const VIEWS: Partial<Record<TabId, React.ComponentType>> = {
   works: WorksView,
@@ -45,7 +44,6 @@ export default function ViewSwitcher({
   useEffect(() => {
     const warm = () => {
       void import("./WorksView");
-      void import("./CareerView");
     };
     const w = window as Window & {
       requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;

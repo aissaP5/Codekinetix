@@ -209,6 +209,9 @@
     background-image: url("/noise-tile.png");
     background-size: 200px 200px;
     background-repeat: repeat;
+    transform: translateZ(0);
+    will-change: auto;
+    pointer-events: none;
   }
   /* Hide expensive full-viewport overlays on touch devices — invisible
      at phone DPI / 5.5% opacity but cost ~4ms/frame in compositor time */
@@ -356,6 +359,9 @@
 /* Performance: skip layout/paint for off-screen sections until near viewport */
 .av-stats,
 .av-cta,
+#services,
+.ck-process-section,
+.ck-clients-section,
 footer {
   content-visibility: auto;
   contain-intrinsic-size: 1px 400px;

@@ -63,8 +63,8 @@ function SpotlightCard({
             muted
             loop
             playsInline
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover object-top opacity-0 group-hover:opacity-100 transition-opacity duration-600 pointer-events-none"
+            preload="none"
+            className="absolute inset-0 w-full h-full object-cover object-top opacity-0 group-hover:opacity-100 transition-opacity duration-600 pointer-events-none hidden sm:block"
           />
         )}
 

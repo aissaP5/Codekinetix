@@ -81,7 +81,7 @@ export default function ProcessSection() {
   return (
     <section
       ref={rootRef}
-      className="px-4 sm:px-8 py-24 sm:py-32 border-t border-bone/10 bg-void relative overflow-hidden"
+      className="ck-process-section px-4 sm:px-8 py-24 sm:py-32 border-t border-bone/10 bg-void relative overflow-hidden"
       aria-label="Studio Methodology"
     >
       <div className="max-w-7xl mx-auto">

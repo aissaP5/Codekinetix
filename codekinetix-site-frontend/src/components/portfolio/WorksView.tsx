@@ -66,7 +66,10 @@ function ProjectCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left focus-visible:outline-2 focus-visible:outline-volt sm:hover:volt-glow sm:active:volt-glow border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform [-webkit-tap-highlight-color:transparent] [touch-action:pan-y] select-none"
-      style={{ zIndex: index + 1 }}
+      style={{
+        zIndex: index + 1,
+        opacity: index > 0 ? 0 : 1,
+      }}
       aria-label={`Open the ${slot.name} project`}
     >
       {/* ── FULL-BLEED SCREENSHOT — mobile-native portrait on small screens ── */}
@@ -192,7 +195,7 @@ export default function WorksView() {
 
       cards.forEach((card, i) => {
         if (i > 0) {
-          gsap.set(card, { yPercent: 100 });
+          gsap.set(card, { yPercent: 100, opacity: 1 });
         }
       });
 

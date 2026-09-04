@@ -2,9 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { useKinetix, type TabId } from "@/lib/store";
+import { navigateWithTransition } from "@/components/portfolio/PageTransition";
 
 const TABS = [
   { id: "studio", label: "STUDIO", href: "/" },
@@ -14,6 +15,7 @@ const TABS = [
 ];
 
 export default function BottomNav() {
+  const router = useRouter();
   const pathname = usePathname();
   const pillRef = useRef<HTMLDivElement>(null);
   const setActiveTab = useKinetix((s) => s.setActiveTab);
@@ -53,10 +55,14 @@ export default function BottomNav() {
     return () => ro.disconnect();
   }, [activeTabId]);
 
-  const handleTabClick = (tabId: string) => {
-    if (activeTabId !== tabId) {
-      setActiveTab(tabId as TabId);
+  const handleTabClick = (e: React.MouseEvent, href: string, tabId: string) => {
+    if (activeTabId === tabId) {
+      e.preventDefault();
+      return;
     }
+    e.preventDefault();
+    e.stopPropagation();
+    navigateWithTransition(href, (url) => router.push(url));
   };
 
   return (
@@ -81,7 +87,7 @@ export default function BottomNav() {
                 key={t.id}
                 href={t.href}
                 data-tab={t.id}
-                onClick={() => handleTabClick(t.id)}
+                onClick={(e) => handleTabClick(e, t.href, t.id)}
                 className={`relative z-10 flex items-center justify-center h-[36px] px-3.5 sm:px-6 rounded-full font-mono text-[10px] sm:text-[11px] tracking-[0.16em] select-none [-webkit-tap-highlight-color:transparent] transition-colors duration-300 ${
                   isCurrent
                     ? "text-void font-bold"

@@ -120,19 +120,21 @@ export default function CaseStudyClient({
 
         {/* Hero Full-Bleed Media */}
         <div className="cs-fade relative aspect-[16/9] sm:aspect-[21/9] bg-void border border-bone/15 overflow-hidden group">
-          <img
-            src={slot.image}
-            alt={slot.name}
-            className="w-full h-full object-cover object-top group-hover:scale-102 transition-transform duration-700"
-          />
-          {slot.video && (
+          {slot.video ? (
             <video
               src={slot.video}
+              poster={slot.image}
               autoPlay
               muted
               loop
               playsInline
-              className="absolute inset-0 w-full h-full object-cover object-top opacity-0 sm:opacity-90 transition-opacity pointer-events-none"
+              className="w-full h-full object-cover object-top group-hover:scale-102 transition-transform duration-700 pointer-events-none"
+            />
+          ) : (
+            <img
+              src={slot.image}
+              alt={slot.name}
+              className="w-full h-full object-cover object-top group-hover:scale-102 transition-transform duration-700"
             />
           )}
           <div className="absolute bottom-4 right-4 flex items-center gap-3">

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useRef, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useKinetix, type TabId } from "@/lib/store";
 import { ScrollTrigger } from "@/lib/gsap";
 import Preloader from "@/components/portfolio/Preloader";
@@ -10,7 +10,7 @@ import Footer from "@/components/portfolio/Footer";
 import ScrollProgress from "@/components/portfolio/ScrollProgress";
 import ProjectShell from "@/components/project/ProjectShell";
 import ProjectTransition from "@/components/project/ProjectTransition";
-import PageTransition from "@/components/portfolio/PageTransition";
+import PageTransition, { navigateWithTransition } from "@/components/portfolio/PageTransition";
 import CustomCursor from "@/components/portfolio/CustomCursor";
 
 function getTabFromPath(path: string): TabId {
@@ -34,54 +34,23 @@ function RouteTransitionContainer({
   const contentTab = useKinetix((s) => s.contentTab);
   const setActiveTab = useKinetix((s) => s.setActiveTab);
   const setContentTab = useKinetix((s) => s.setContentTab);
-  const phase = useKinetix((s) => s.phase);
-
-  // Keep track of the currently displayed children during transitions
-  const [displayedChildren, setDisplayedChildren] = useState<React.ReactNode>(children);
   const prevPathnameRef = useRef(pathname);
-  const isInitialMount = useRef(true);
 
-  // Sync activeTab when pathname changes
+  // Sync state on route change (e.g. browser back/forward or initial load)
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      setActiveTab(targetTab);
-      setContentTab(targetTab);
-      setDisplayedChildren(children);
-      prevPathnameRef.current = pathname;
-      return;
-    }
-
     if (pathname !== prevPathnameRef.current) {
       prevPathnameRef.current = pathname;
-      if (activeTab !== targetTab) {
-        setActiveTab(targetTab);
-      }
-    }
-  }, [pathname, targetTab, activeTab, setActiveTab, setContentTab, children]);
-
-  // When contentTab flips to targetTab under the cover,
-  // update the displayed children and reset the scroll position
-  useEffect(() => {
-    if (contentTab === targetTab) {
-      setDisplayedChildren(children);
+      setActiveTab(targetTab);
+      setContentTab(targetTab);
       scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
-      // Give the page time to paint before recalculating scroll triggers
       const t = setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 200);
+      }, 150);
       return () => clearTimeout(t);
     }
-  }, [contentTab, targetTab, children, scrollRef]);
+  }, [pathname, targetTab, setActiveTab, setContentTab, scrollRef]);
 
-  // When phase becomes "site" on initial load, ensure children are set
-  useEffect(() => {
-    if (phase === "site" && contentTab === targetTab) {
-      setDisplayedChildren(children);
-    }
-  }, [phase, contentTab, targetTab, children]);
-
-  return <div>{displayedChildren}</div>;
+  return <div>{children}</div>;
 }
 
 export default function PortfolioShell({
@@ -89,11 +58,53 @@ export default function PortfolioShell({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const scrollRef = useRef<HTMLDivElement>(null);
   const phase = useKinetix((s) => s.phase);
 
+  const handleLinkClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    const anchor = (e.target as HTMLElement).closest("a");
+    if (!anchor) return;
+    const href = anchor.getAttribute("href");
+    if (!href) return;
+
+    // Ignore external, hash links, new tabs, modifier keys
+    if (
+      href.startsWith("http://") ||
+      href.startsWith("https://") ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:") ||
+      href.startsWith("#") ||
+      anchor.target === "_blank" ||
+      anchor.hasAttribute("download") ||
+      e.ctrlKey ||
+      e.metaKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return;
+    }
+
+    // Ignore same-page clicks
+    const cleanHref = href.split("?")[0].split("#")[0];
+    const cleanCurrent = pathname.split("?")[0].split("#")[0];
+    if (cleanHref === cleanCurrent && !href.includes("?")) {
+      e.preventDefault();
+      return;
+    }
+
+    // Intercept internal page navigation: play cover curtain BEFORE changing route
+    e.preventDefault();
+    e.stopPropagation();
+    navigateWithTransition(href, (url) => router.push(url));
+  };
+
   return (
-    <div className="h-dvh flex flex-col overflow-hidden bg-void text-bone relative">
+    <div
+      onClickCapture={handleLinkClickCapture}
+      className="h-dvh flex flex-col overflow-hidden bg-void text-bone relative"
+    >
       <CustomCursor />
       <Preloader />
 
