@@ -164,27 +164,6 @@ export default function HomePage() {
 
       {/* ──────────────────────────────────────── WHO WE WORK WITH */}
       <ClientsSection />
-
-
-
-      {/* ──────────────────────────────────────── CTA BANNER */}
-      <section className="px-4 sm:px-8 py-20 sm:py-28 border-t border-bone/10 bg-void">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-3xl sm:text-5xl lg:text-6xl leading-[0.95] mb-6">
-            LET&apos;S BUILD SOMETHING DIFFERENT.
-          </h2>
-          <p className="text-bone/50 text-sm max-w-md mx-auto mb-8 leading-relaxed">
-            Tell us your brand name and what you need. We respond within 24 hours.
-          </p>
-          <Link
-            href="/contact"
-            data-cursor="open"
-            className="inline-block bg-volt text-void font-mono text-xs font-bold tracking-[0.2em] px-10 py-5 uppercase hover:bg-bone transition-colors"
-          >
-            START A PROJECT ↗
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

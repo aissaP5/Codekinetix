@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 const PHASES = [
   {
@@ -56,6 +56,7 @@ export default function ProcessSection() {
     const scrollerEl = root.closest("main") ?? undefined;
 
     const ctx = gsap.context(() => {
+      // 1. Entrance animation
       gsap.fromTo(
         ".process-reveal",
         { y: 40, opacity: 0 },
@@ -73,6 +74,21 @@ export default function ProcessSection() {
           },
         }
       );
+
+      // 2. Scroll-triggered phase highlighting across the ledger's scroll travel
+      const ledger = root.querySelector<HTMLElement>(".process-ledger");
+      if (ledger) {
+        ScrollTrigger.create({
+          trigger: ledger,
+          scroller: scrollerEl,
+          start: "top 72%",
+          end: "bottom 28%",
+          onUpdate: (self) => {
+            const idx = Math.min(3, Math.floor(self.progress * 4));
+            setActivePhase(idx);
+          },
+        });
+      }
     }, root);
 
     return () => ctx.revert();
@@ -103,7 +119,7 @@ export default function ProcessSection() {
         </div>
 
         {/* Bespoke Interactive Phase Ledger */}
-        <div className="process-reveal border border-bone/15 bg-panel/40 divide-y divide-bone/10">
+        <div className="process-reveal process-ledger border border-bone/15 bg-panel/40 divide-y divide-bone/10">
           {PHASES.map((p, idx) => {
             const isActive = activePhase === idx;
             return (

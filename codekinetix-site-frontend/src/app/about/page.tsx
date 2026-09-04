@@ -223,24 +223,6 @@ export default function AboutPage() {
 
       {/* ──────────────────────────────────── FAQ ACCORDION */}
       <FaqSection />
-
-      {/* ──────────────────────────────────── COLLABORATION CTA */}
-      <section className="px-4 sm:px-8 py-16 border-t border-bone/10">
-        <div className="max-w-4xl mx-auto border border-bone/20 bg-panel/70 p-8 sm:p-14 text-center">
-          <h3 className="font-extrabold type-xwide uppercase text-3xl sm:text-5xl text-bone mb-4">
-            LET&apos;S DISCUSS YOUR PROJECT.
-          </h3>
-          <p className="text-bone/60 text-sm max-w-lg mx-auto leading-relaxed mb-8">
-            Tell us about your objectives and timeline. We review every brief directly and reply within 24 hours.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-block bg-volt text-void font-mono text-xs font-bold tracking-[0.2em] px-8 py-4 uppercase hover:bg-bone transition-colors"
-          >
-            START A PROJECT ↗
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

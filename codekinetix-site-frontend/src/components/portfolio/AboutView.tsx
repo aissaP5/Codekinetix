@@ -312,29 +312,6 @@ export default function AboutView() {
           ))}
         </div>
       </section>
-
-      {/* ──────────────────────────────────── CTA STRIP */}
-      <section className="px-4 sm:px-8 py-16 border-t border-bone/10">
-        <div className="max-w-4xl mx-auto border border-volt/30 bg-panel/60 p-8 sm:p-12 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div>
-            <span className="font-mono text-[10px] text-volt tracking-widest uppercase mb-1 block">
-              NEXT STEP //
-            </span>
-            <h3 className="font-extrabold type-xwide uppercase text-2xl sm:text-3xl text-bone">
-              READY TO BUILD TOGETHER?
-            </h3>
-            <p className="font-mono text-xs text-bone/60 mt-1">
-              Submit your project brief directly to our team.
-            </p>
-          </div>
-          <Link
-            href="/contact"
-            className="bg-volt text-void font-mono text-xs font-bold tracking-[0.2em] px-8 py-4 uppercase hover:bg-bone transition-colors shrink-0"
-          >
-            START A PROJECT ↗
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

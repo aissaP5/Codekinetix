@@ -126,13 +126,13 @@ export default function Footer() {
           </h2>
         </div>
 
-        <div className="ft-reveal flex flex-wrap items-baseline gap-4 mb-4 text-left">
+        <div className="ft-reveal flex flex-wrap items-baseline gap-4 mb-4 text-left max-w-full">
           <a
             href="mailto:codekinetixstudio@gmail.com"
-            className="group inline-block font-extrabold type-xwide uppercase tracking-[-0.02em] leading-[1.08] break-words sm:break-normal text-bone hover:text-volt transition-colors duration-400 text-[clamp(20px,5.2vw,46px)]"
+            className="group inline-flex items-center font-extrabold sm:type-xwide uppercase tracking-tight leading-[1.08] text-bone hover:text-volt transition-colors duration-400 text-[clamp(14px,4.2vw,46px)] max-w-full"
           >
-            codekinetixstudio@gmail.com
-            <span className="inline-block ml-3 text-volt group-hover:rotate-45 transition-transform duration-400 align-middle text-[0.5em]">
+            <span className="truncate">codekinetixstudio@gmail.com</span>
+            <span className="inline-block ml-2 sm:ml-3 text-volt group-hover:rotate-45 transition-transform duration-400 align-middle text-[0.6em] shrink-0">
               ↗
             </span>
           </a>
