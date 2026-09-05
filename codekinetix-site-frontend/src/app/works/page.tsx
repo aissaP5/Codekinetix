@@ -24,7 +24,7 @@ function GridCard({
       videoRef.current.playbackRate = 1.0;
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {});
+        playPromise.catch(() => { });
       }
     }
   };
@@ -199,11 +199,10 @@ export default function WorksPage() {
                   setSelectedCat(cat);
                   if (cat !== "ALL") setViewMode("grid");
                 }}
-                className={`font-mono text-[10px] sm:text-xs tracking-wider uppercase px-4 py-2 border transition-all ${
-                  selectedCat === cat
+                className={`font-mono text-[10px] sm:text-xs tracking-wider uppercase px-4 py-2 border transition-all ${selectedCat === cat
                     ? "bg-volt text-void border-volt font-bold shadow-[0_0_20px_rgba(58,111,255,0.4)]"
                     : "bg-void text-bone/60 border-bone/15 hover:border-bone/40 hover:text-bone"
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -216,21 +215,19 @@ export default function WorksPage() {
                 setViewMode("deck");
                 setSelectedCat("ALL");
               }}
-              className={`px-3 py-1.5 border uppercase transition-colors ${
-                viewMode === "deck"
+              className={`px-3 py-1.5 border uppercase transition-colors ${viewMode === "deck"
                   ? "border-volt text-volt font-bold"
                   : "border-bone/20 text-bone/50 hover:text-bone"
-              }`}
+                }`}
             >
               STACK DECK
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`px-3 py-1.5 border uppercase transition-colors ${
-                viewMode === "grid"
+              className={`px-3 py-1.5 border uppercase transition-colors ${viewMode === "grid"
                   ? "border-volt text-volt font-bold"
                   : "border-bone/20 text-bone/50 hover:text-bone"
-              }`}
+                }`}
             >
               GRID VIEW
             </button>

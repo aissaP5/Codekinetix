@@ -23,7 +23,7 @@ function SpotlightCard({
   const handleMouseEnter = () => {
     if (slot.video && videoRef.current) {
       const p = videoRef.current.play();
-      if (p !== undefined) p.catch(() => {});
+      if (p !== undefined) p.catch(() => { });
     }
   };
 
