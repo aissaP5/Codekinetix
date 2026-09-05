@@ -41,20 +41,15 @@ function SpotlightCard({
       onMouseLeave={handleMouseLeave}
       className="feat-card group block relative overflow-hidden bg-void cursor-pointer"
     >
-      {/* Full-bleed image */}
-      <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden">
-        <picture>
-          {slot.mobileImage && (
-            <source media="(max-width: 639px)" srcSet={slot.mobileImage} />
-          )}
-          <img
-            src={slot.image}
-            alt={slot.name}
-            className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-[900ms] ease-out"
-            loading="lazy"
-            decoding="async"
-          />
-        </picture>
+      {/* Full-bleed image — 16:10 matches the 1440x900 landscape artwork */}
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <img
+          src={slot.image}
+          alt={slot.name}
+          className="w-full h-full object-cover object-center group-hover:scale-[1.04] transition-transform duration-[900ms] ease-out"
+          loading="lazy"
+          decoding="async"
+        />
 
         {slot.video && (
           <video

@@ -43,18 +43,13 @@ function GridCard({
       className="work-item-card group border border-bone/15 bg-panel/50 overflow-hidden flex flex-col justify-between hover:border-volt/70 transition-all duration-400 cursor-pointer"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-void">
-        <picture>
-          {slot.mobileImage && (
-            <source media="(max-width: 639px)" srcSet={slot.mobileImage} />
-          )}
-          <img
-            src={slot.image}
-            alt={slot.name}
-            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
-            loading="lazy"
-            decoding="async"
-          />
-        </picture>
+        <img
+          src={slot.image}
+          alt={slot.name}
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+          loading="lazy"
+          decoding="async"
+        />
 
         {slot.video && (
           <video
