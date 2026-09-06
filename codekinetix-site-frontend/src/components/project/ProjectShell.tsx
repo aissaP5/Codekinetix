@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { useKinetix } from "@/lib/store";
 import { getSlot } from "@/lib/projects";
@@ -11,6 +12,7 @@ import { getSlot } from "@/lib/projects";
  * an iframe, framed by the studio toolbar with a back action.
  */
 export default function ProjectShell() {
+  const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
   const activeProject = useKinetix((s) => s.activeProject);
   const phase = useKinetix((s) => s.phase);
@@ -18,6 +20,11 @@ export default function ProjectShell() {
   const [loaded, setLoaded] = useState(false);
 
   const slot = getSlot(activeProject);
+
+  const handleExit = () => {
+    router.replace("/works");
+    exitProject();
+  };
 
   // fresh load state whenever we step into another project
   useEffect(() => {
@@ -28,10 +35,10 @@ export default function ProjectShell() {
   useEffect(() => {
     if (!slot) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") exitProject();
+      if (e.key === "Escape") handleExit();
     };
     const onPopState = () => {
-      exitProject();
+      handleExit();
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("popstate", onPopState);
@@ -39,7 +46,7 @@ export default function ProjectShell() {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("popstate", onPopState);
     };
-  }, [slot, exitProject]);
+  }, [slot]);
 
   useEffect(() => {
     if (!rootRef.current || !slot) return;
@@ -65,7 +72,7 @@ export default function ProjectShell() {
       {/* toolbar */}
       <div className="ps-enter relative z-20 flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 py-2.5 border-b border-bone/10 bg-void">
         <button
-          onClick={exitProject}
+          onClick={handleExit}
           className="group flex items-center gap-2 bg-bone text-void font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.15em] px-4 py-2 hover:bg-volt transition-colors duration-300"
         >
           <span className="group-hover:-translate-x-0.5 transition-transform duration-300">←</span>{" "}

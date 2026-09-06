@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { useKinetix } from "@/lib/store";
 import { curtain } from "@/lib/curtain";
@@ -12,6 +13,7 @@ import { getSlot } from "@/lib/projects";
  * the view swaps underneath, then it drains upward.
  */
 export default function ProjectTransition() {
+  const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -29,8 +31,8 @@ export default function ProjectTransition() {
     const slot = getSlot(projectId);
 
     // entering a project — or returning to the portfolio
-    const label = slot ? slot.name : "THE STUDIO";
-    const sub = slot ? `OPENING — ${slot.tagline}` : "BACK TO THE PORTFOLIO";
+    const label = slot ? slot.name : "WORKS";
+    const sub = slot ? `OPENING — ${slot.tagline}` : "SELECTED CASE ARCHIVE";
 
     // build falling letters for the label
     if (labelRef.current) {
@@ -97,8 +99,12 @@ export default function ProjectTransition() {
       // 3. swap the underlying view while covered
       .call(() => {
         const store = useKinetix.getState();
-        if (projectId) store.projectReady();
-        else store.siteReady();
+        if (projectId) {
+          store.projectReady();
+        } else {
+          router.replace("/works");
+          store.siteReady();
+        }
       })
       // 4. brief beat then drain away upward
       .to(root, { clipPath: "inset(0% 0% 100% 0%)", duration: 0.55, ease: "power3.inOut" }, "+=0.15")

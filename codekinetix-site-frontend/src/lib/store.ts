@@ -49,11 +49,6 @@ export const useKinetix = create<KinetixState>((set) => ({
   },
   projectReady: () => set({ phase: "project" }),
   exitProject: () => {
-    if (typeof window !== "undefined") {
-      if (window.location.search.includes("view=live") || window.location.pathname.startsWith("/works/")) {
-        window.history.pushState(null, "", "/works");
-      }
-    }
     set({ phase: "opening", activeProject: null });
   },
   siteReady: () => set({ phase: "site" }),
