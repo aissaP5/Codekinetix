@@ -25,7 +25,7 @@ const fragmentMono = Fragment_Mono({
   weight: ["400"],
 });
 
-const SITE_URL = "https://codekinetix.dev";
+const SITE_URL = "https://codekinetix.pages.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
