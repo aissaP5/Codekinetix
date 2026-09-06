@@ -73,15 +73,15 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-auto max-w-[95vw]"
+      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-auto max-w-[calc(100vw-1rem)] sm:max-w-none"
       aria-label="Bottom Navigation"
     >
-      <div className="flex items-center bg-void text-bone rounded-full px-1.5 py-1.5 border border-bone/15 shadow-[0_12px_44px_rgba(0,0,0,0.6),0_0_34px_rgba(58,111,255,0.28)]">
+      <div className="flex items-center bg-void text-bone rounded-full p-1 sm:p-1.5 border border-bone/15 shadow-[0_12px_44px_rgba(0,0,0,0.6),0_0_34px_rgba(58,111,255,0.28)]">
         <div className="relative flex items-center overflow-x-auto no-scrollbar">
           {/* Animated active volt pill */}
           <div
             ref={pillRef}
-            className="absolute top-0 left-0 h-[36px] rounded-full bg-volt"
+            className="absolute top-0 left-0 h-[32px] sm:h-[36px] rounded-full bg-volt"
             style={{ width: 80 }}
             aria-hidden="true"
           />
@@ -94,7 +94,7 @@ export default function BottomNav() {
                 href={t.href}
                 data-tab={t.id}
                 onClick={(e) => handleTabClick(e, t.href, t.id)}
-                className={`relative z-10 flex items-center justify-center h-[36px] px-3.5 sm:px-6 rounded-full font-mono text-[10px] sm:text-[11px] tracking-[0.16em] select-none [-webkit-tap-highlight-color:transparent] transition-colors duration-300 ${
+                className={`relative z-10 flex items-center justify-center h-[32px] sm:h-[36px] px-2.5 sm:px-5 md:px-6 rounded-full font-mono text-[9px] sm:text-[11px] tracking-[0.12em] sm:tracking-[0.16em] select-none whitespace-nowrap [-webkit-tap-highlight-color:transparent] transition-colors duration-300 ${
                   isCurrent
                     ? "text-void font-bold"
                     : "text-bone/55 hover:text-bone"

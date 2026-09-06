@@ -118,7 +118,7 @@ export default function Footer() {
       <div className="bg-grid-dark absolute inset-0 pointer-events-none mobile-hide-overlay" aria-hidden="true" />
 
       {/* Left-aligned container with safe bottom clearance for floating nav */}
-      <div className="relative z-10 px-4 sm:px-8 pt-16 sm:pt-24 pb-24 sm:pb-28 text-left">
+      <div className="relative z-10 max-w-[1760px] mx-auto px-4 sm:px-8 md:px-10 lg:px-16 xl:px-20 pt-16 sm:pt-24 pb-24 sm:pb-28 text-left">
 
         <div className="ft-reveal mb-8">
           <h2 className="font-extrabold type-xwide uppercase tracking-[-0.02em] leading-[0.92] text-bone text-[8vw] sm:text-[5vw] max-w-4xl text-left">
@@ -126,12 +126,12 @@ export default function Footer() {
           </h2>
         </div>
 
-        <div className="ft-reveal flex flex-wrap items-baseline gap-4 mb-4 text-left max-w-full">
+        <div className="ft-reveal flex flex-wrap items-baseline gap-4 mb-4 text-left max-w-full min-w-0">
           <a
             href="mailto:codekinetixstudio@gmail.com"
-            className="group inline-flex items-center font-extrabold sm:type-xwide uppercase tracking-tight leading-[1.08] text-bone hover:text-volt transition-colors duration-400 text-[clamp(14px,4.2vw,46px)] max-w-full"
+            className="group inline-flex items-center font-extrabold sm:type-xwide uppercase tracking-tight leading-[1.08] text-bone hover:text-volt transition-colors duration-400 text-[clamp(14px,4.2vw,46px)] max-w-full min-w-0 overflow-hidden"
           >
-            <span className="truncate">codekinetixstudio@gmail.com</span>
+            <span className="truncate min-w-0">codekinetixstudio@gmail.com</span>
             <span className="inline-block ml-2 sm:ml-3 text-volt group-hover:rotate-45 transition-transform duration-400 align-middle text-[0.6em] shrink-0">
               ↗
             </span>

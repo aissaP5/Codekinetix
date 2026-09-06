@@ -91,6 +91,9 @@ export const metadata: Metadata = {
     },
   },
   category: "technology",
+  verification: {
+    google: "VC95CYyCz3BLpsRDJelaQkRHGvN34GVfjm_RD7JdvKA",
+  },
 };
 
 const jsonLd = {

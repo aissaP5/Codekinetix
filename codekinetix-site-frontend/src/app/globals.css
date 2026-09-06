@@ -366,3 +366,20 @@ footer {
   content-visibility: auto;
   contain-intrinsic-size: 1px 400px;
 }
+
+/* Landscape phone height adaptation */
+@media (max-height: 520px) and (orientation: landscape) {
+  .wv-stack-wrap > div {
+    height: calc(100dvh - 56px) !important;
+  }
+  .wv-stack-wrap .wv-card {
+    border-radius: 0.5rem !important;
+  }
+}
+
+/* Prevent text cut-off on ultra-narrow viewports (< 340px) */
+@media (max-width: 340px) {
+  .type-xwide {
+    letter-spacing: -0.04em !important;
+  }
+}

@@ -288,10 +288,10 @@ export default function WorksDeck() {
         className="wv-stack-wrap relative"
         style={{ height: `${PROJECT_SLOTS.length * 90}vh` }}
       >
-        <div className="sticky top-0 h-[calc(100dvh-80px)] flex flex-col justify-center px-4 sm:px-8">
+        <div className="sticky top-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-80px)] flex flex-col justify-center px-3 sm:px-8">
           <div
             ref={deckRef}
-            className="relative w-full max-w-5xl h-[58vh] sm:h-[68vh] mx-auto overflow-hidden rounded-xl shadow-2xl border border-bone/10 bg-void"
+            className="relative w-full max-w-5xl h-[54vh] sm:h-[62vh] md:h-[68vh] max-h-[760px] mx-auto overflow-hidden rounded-xl shadow-2xl border border-bone/10 bg-void"
           >
             {PROJECT_SLOTS.map((slot, i) => (
               <ProjectCard

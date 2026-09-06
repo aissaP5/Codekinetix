@@ -801,7 +801,7 @@ export default function HeroSection() {
       {/* ─────────────────────────────────────────────────────────
           DESKTOP HERO (sm+) — split layout with enlarged scale
           ───────────────────────────────────────────────────────── */}
-      <div className="hidden sm:flex relative z-10 w-full max-w-[1760px] mx-auto flex-1 flex-col lg:flex-row items-center justify-between px-8 md:px-12 lg:px-16 xl:px-20 pt-16 md:pt-20 lg:pt-24 pb-14 md:pb-18 lg:pb-20 gap-10 lg:gap-14">
+      <div className="hidden sm:flex relative z-10 w-full max-w-[1760px] mx-auto flex-1 flex-col lg:flex-row items-center justify-between px-6 sm:px-8 md:px-10 lg:px-16 xl:px-20 pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-12 sm:pb-14 md:pb-18 lg:pb-20 gap-8 md:gap-10 lg:gap-14">
 
         {/* ─── LEFT COLUMN: HERO COPY ─── */}
         <div className="w-full lg:w-[50%] xl:w-[48%] flex flex-col justify-center order-1 lg:order-1 text-left">
@@ -809,7 +809,7 @@ export default function HeroSection() {
           {/* Scramble Headline — Enlarged monumental display */}
           <h1
             className="font-extrabold type-xwide uppercase leading-[0.92] tracking-[-0.04em]"
-            style={{ fontSize: "clamp(30px, 4.4vw, 64px)" }}
+            style={{ fontSize: "clamp(32px, 4.8vw, 68px)" }}
             aria-label="We build digital experiences people remember."
           >
             {LINES.map((line, li) => (
@@ -862,7 +862,7 @@ export default function HeroSection() {
         <div className="h-stage-wrap w-full lg:w-[52%] xl:w-[54%] flex items-center justify-center order-2 lg:order-2">
           <div
             ref={stageRef}
-            className="relative w-full max-w-[540px] lg:max-w-[740px] xl:max-w-[820px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
+            className="relative w-full max-w-[480px] md:max-w-[580px] lg:max-w-[740px] xl:max-w-[820px] aspect-[16/11] flex items-center justify-center cursor-crosshair group touch-pan-y mx-auto"
             style={{ perspective: "1000px" }}
           >
             {/* Ambient Radial Volt Halo */}
@@ -918,7 +918,7 @@ export default function HeroSection() {
       {/* ═══════════════════════════════════════════════════════
           BOTTOM EDGE BAR (DESKTOP / TABLET only)
           ═══════════════════════════════════════════════════════ */}
-      <div className="h-edge relative z-10 w-full max-w-[1720px] mx-auto px-10 lg:px-16 pb-8 pt-3 border-t border-bone/10 hidden sm:flex items-center justify-between font-mono text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-bone/40">
+      <div className="h-edge relative z-10 w-full max-w-[1720px] mx-auto px-6 sm:px-8 md:px-10 lg:px-16 pb-8 pt-3 border-t border-bone/10 hidden sm:flex items-center justify-between font-mono text-[9px] sm:text-[10px] tracking-[0.22em] uppercase text-bone/40">
         <div>
           DIGITAL EXPERIENCE STUDIO · CODEKINETIX®
         </div>

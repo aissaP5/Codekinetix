@@ -87,14 +87,14 @@ export default function ProjectForm() {
   return (
     <div className="bg-panel/70 border border-bone/15 overflow-hidden">
       {/* Step Indicator Header */}
-      <div className="flex border-b border-bone/10 bg-void/60 text-[10px] font-mono tracking-widest text-bone/40">
-        <div className={`flex-1 py-3 px-4 text-center border-r border-bone/10 ${step === 0 ? "text-volt font-bold bg-volt/5" : ""}`}>
+      <div className="flex border-b border-bone/10 bg-void/60 text-[9px] sm:text-[10px] font-mono tracking-wider sm:tracking-widest text-bone/40">
+        <div className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-4 text-center truncate border-r border-bone/10 ${step === 0 ? "text-volt font-bold bg-volt/5" : ""}`}>
           01. SCOPE
         </div>
-        <div className={`flex-1 py-3 px-4 text-center border-r border-bone/10 ${step === 1 ? "text-volt font-bold bg-volt/5" : ""}`}>
+        <div className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-4 text-center truncate border-r border-bone/10 ${step === 1 ? "text-volt font-bold bg-volt/5" : ""}`}>
           02. AESTHETIC
         </div>
-        <div className={`flex-1 py-3 px-4 text-center ${step === 2 ? "text-volt font-bold bg-volt/5" : ""}`}>
+        <div className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-4 text-center truncate ${step === 2 ? "text-volt font-bold bg-volt/5" : ""}`}>
           03. DETAILS
         </div>
       </div>

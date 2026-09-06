@@ -133,7 +133,7 @@ export default function ProcessSection() {
                     : "hover:bg-panel/60 border-l-4 border-l-transparent"
                 }`}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   {/* Left: Roman Numeral & Title */}
                   <div className="flex items-baseline gap-6 sm:gap-10">
                     <span
@@ -163,7 +163,7 @@ export default function ProcessSection() {
                   </div>
 
                   {/* Right: Dynamic Description Expansion */}
-                  <div className="lg:max-w-lg lg:text-right">
+                  <div className="md:max-w-md lg:max-w-lg md:text-right">
                     <p
                       className={`font-serif italic text-sm sm:text-base mb-1 transition-colors duration-300 ${
                         isActive ? "text-bone/90" : "text-bone/50"

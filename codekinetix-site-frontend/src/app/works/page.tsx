@@ -190,8 +190,8 @@ export default function WorksPage() {
         </div>
 
         {/* Filter controls & view mode */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-bone/10 pb-6">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-bone/10 pb-6">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -199,7 +199,7 @@ export default function WorksPage() {
                   setSelectedCat(cat);
                   if (cat !== "ALL") setViewMode("grid");
                 }}
-                className={`font-mono text-[10px] sm:text-xs tracking-wider uppercase px-4 py-2 border transition-all ${selectedCat === cat
+                className={`font-mono text-[10px] sm:text-xs tracking-wider uppercase px-3.5 sm:px-4 py-2 border whitespace-nowrap shrink-0 transition-all ${selectedCat === cat
                     ? "bg-volt text-void border-volt font-bold shadow-[0_0_20px_rgba(58,111,255,0.4)]"
                     : "bg-void text-bone/60 border-bone/15 hover:border-bone/40 hover:text-bone"
                   }`}
@@ -209,7 +209,7 @@ export default function WorksPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 font-mono text-xs">
+          <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs shrink-0 self-end sm:self-auto">
             <button
               onClick={() => {
                 setViewMode("deck");
