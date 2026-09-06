@@ -179,7 +179,7 @@ export default function WorksPage() {
   return (
     <div ref={rootRef} className="pb-8 sm:pb-12">
       {/* Header */}
-      <div className="px-4 sm:px-8 pt-10 sm:pt-16 pb-8">
+      <div className="px-4 sm:px-8 2xl:px-12 pt-10 sm:pt-16 pb-8 max-w-5xl xl:max-w-6xl 2xl:max-w-[1480px] mx-auto">
         <div className="max-w-4xl mb-10">
           <h1 className="font-extrabold type-xwide uppercase tracking-[-0.02em] text-bone text-4xl sm:text-6xl lg:text-7xl leading-[0.92] mb-6">
             SELECTED WORKS.
@@ -240,7 +240,7 @@ export default function WorksPage() {
         <WorksDeck />
       ) : (
         /* View Mode 2: Expanded Large Grid */
-        <div className="px-4 sm:px-8 pt-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="px-4 sm:px-8 2xl:px-12 pt-8 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8 max-w-5xl xl:max-w-6xl 2xl:max-w-[1480px] mx-auto">
           {filtered.map((slot) => (
             <GridCard
               key={slot.id}

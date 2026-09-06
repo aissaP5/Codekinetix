@@ -40,7 +40,7 @@ function ProjectCard({
       data-card={index}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform select-none"
+      className="wv-card absolute inset-0 w-full h-full overflow-hidden rounded-xl group text-left border border-bone/15 bg-void shadow-2xl transform-gpu will-change-transform [-webkit-tap-highlight-color:transparent] [touch-action:pan-y] select-none"
       style={{
         zIndex: index + 1,
         opacity: index > 0 ? 0 : 1,
@@ -88,27 +88,27 @@ function ProjectCard({
 
       {/* ── TOP BAR ── */}
       <div
-        className="absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-2 px-4 sm:px-8 pt-4 sm:pt-6 font-mono text-[9px] sm:text-xs tracking-[0.25em] uppercase pointer-events-auto"
+        className="absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-2 px-4 sm:px-8 2xl:px-10 pt-4 sm:pt-6 2xl:pt-8 font-mono text-[9px] sm:text-xs 2xl:text-sm tracking-[0.25em] uppercase pointer-events-auto"
         style={{ transform: "translateZ(20px)" }}
       >
-        <span className="px-3 py-1.5 bg-void/85 backdrop-blur-md rounded border border-bone/20 text-bone">
+        <span className="px-3 py-1.5 2xl:px-4 2xl:py-2 bg-void/85 backdrop-blur-md rounded border border-bone/20 text-bone">
           {slot.index} — {slot.name}
         </span>
-        <span className="px-3 py-1.5 bg-void/85 backdrop-blur-md rounded border border-volt/30 text-volt font-bold">
+        <span className="px-3 py-1.5 2xl:px-4 2xl:py-2 bg-void/85 backdrop-blur-md rounded border border-volt/30 text-volt font-bold">
           {slot.tagline}
         </span>
       </div>
 
       {/* ── BOTTOM ROW WITH METADATA & ACTIONS ── */}
       <div
-        className="absolute inset-x-0 bottom-0 z-30 px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 pointer-events-auto"
+        className="absolute inset-x-0 bottom-0 z-30 px-4 sm:px-8 2xl:px-10 pb-4 sm:pb-8 2xl:pb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 pointer-events-auto"
         style={{ transform: "translateZ(20px)" }}
       >
-        <div className="max-w-md">
-          <span className="font-mono text-[9px] sm:text-[10px] tracking-widest text-ash uppercase block mb-1">
+        <div className="max-w-md 2xl:max-w-xl">
+          <span className="font-mono text-[9px] sm:text-[10px] 2xl:text-xs tracking-widest text-ash uppercase block mb-1">
             {slot.meta}
           </span>
-          <p className="font-mono text-xs text-bone/80 line-clamp-2 leading-relaxed hidden sm:block">
+          <p className="font-mono text-xs 2xl:text-sm text-bone/80 line-clamp-2 leading-relaxed hidden sm:block">
             {slot.description}
           </p>
         </div>
@@ -118,7 +118,7 @@ function ProjectCard({
           <Link
             href={`/works/${slot.slug}`}
             data-cursor="open"
-            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-bone text-void font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase hover:bg-volt transition-colors relative z-30 pointer-events-auto"
+            className="px-4 sm:px-6 2xl:px-7 py-2.5 sm:py-3 2xl:py-3.5 bg-bone text-void font-mono text-[10px] sm:text-xs 2xl:text-sm font-bold tracking-wider uppercase hover:bg-volt transition-colors relative z-30 pointer-events-auto"
           >
             CASE STUDY ↗
           </Link>
@@ -129,7 +129,7 @@ function ProjectCard({
               openProject(slot.id);
             }}
             data-cursor="view"
-            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-volt text-void font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase hover:bg-bone transition-colors relative z-30 pointer-events-auto"
+            className="px-4 sm:px-6 2xl:px-7 py-2.5 sm:py-3 2xl:py-3.5 bg-volt text-void font-mono text-[10px] sm:text-xs 2xl:text-sm font-bold tracking-wider uppercase hover:bg-bone transition-colors relative z-30 pointer-events-auto"
           >
             LIVE VIEW ↗
           </button>
@@ -288,10 +288,10 @@ export default function WorksDeck() {
         className="wv-stack-wrap relative"
         style={{ height: `${PROJECT_SLOTS.length * 90}vh` }}
       >
-        <div className="sticky top-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-80px)] flex flex-col justify-center px-3 sm:px-8">
+        <div className="sticky top-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-80px)] flex flex-col justify-center px-3 sm:px-8 2xl:px-12">
           <div
             ref={deckRef}
-            className="relative w-full max-w-5xl h-[54vh] sm:h-[62vh] md:h-[68vh] max-h-[760px] mx-auto overflow-hidden rounded-xl shadow-2xl border border-bone/10 bg-void"
+            className="relative w-full max-w-5xl xl:max-w-6xl 2xl:max-w-[1480px] h-[54vh] sm:h-auto sm:aspect-[16/10] max-h-[calc(100dvh-130px)] 2xl:max-h-[920px] mx-auto overflow-hidden rounded-xl shadow-2xl border border-bone/10 bg-void"
           >
             {PROJECT_SLOTS.map((slot, i) => (
               <ProjectCard

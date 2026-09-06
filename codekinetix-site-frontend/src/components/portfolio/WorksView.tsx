@@ -334,10 +334,10 @@ export default function WorksView() {
 
       {/* ── THE PINNED DECK — compositor-native sticky wrap for silky-smooth mobile scrolling ── */}
       <div ref={wrapRef} className="wv-stack-wrap relative h-[450vh] sm:h-[600vh]">
-        <div className="sticky top-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-80px)] flex flex-col justify-center px-3 sm:px-8">
+        <div className="sticky top-0 h-[calc(100dvh-72px)] sm:h-[calc(100dvh-80px)] flex flex-col justify-center px-3 sm:px-8 2xl:px-12">
           <div
             ref={deckRef}
-            className="relative w-full max-w-5xl h-[54vh] sm:h-[62vh] md:h-[68vh] max-h-[760px] mx-auto overflow-hidden rounded-xl shadow-2xl"
+            className="relative w-full max-w-5xl xl:max-w-6xl 2xl:max-w-[1480px] h-[54vh] sm:h-auto sm:aspect-[16/10] max-h-[calc(100dvh-130px)] 2xl:max-h-[920px] mx-auto overflow-hidden rounded-xl shadow-2xl"
           >
             {PROJECT_SLOTS.map((slot, i) => {
               const t = TREATMENTS[i % TREATMENTS.length];
