@@ -13,7 +13,7 @@ const SECTIONS = [
     tag: "AGREEMENT & SCOPE",
     title: "ACCEPTANCE OF TERMS",
     content: [
-      "By accessing or utilizing the CodeKinetix website (codekinetix.dev), requesting project proposals, or entering into a contractual engagement with CodeKinetix Studio ('we', 'us', 'our'), you ('Client', 'User') agree to be bound by these Terms of Service.",
+      "By accessing or utilizing the CodeKinetix website (codekinetix.pages.dev), requesting project proposals, or entering into a contractual engagement with CodeKinetix Studio ('we', 'us', 'our'), you ('Client', 'User') agree to be bound by these Terms of Service.",
       "These Terms, in conjunction with any specific Statement of Work (SOW), Proposal, or Service Agreement signed between the parties, constitute the entire agreement governing our commercial relationship.",
     ],
   },
